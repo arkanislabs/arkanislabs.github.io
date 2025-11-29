@@ -1,1 +1,285 @@
-<p>Hello!</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arkanis Labs | AI & ML Consulting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- 🎨 THEME CONTROLLER (Digital Alchemist) --- */
+        :root {
+            --bg-deep: #0F0E17;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --text-main: #FFFFFE;
+            --text-muted: #A7A9BE;
+            --color-pop: #00F0FF; /* Neon Cyan */
+            --color-secondary: #7F5AF0; /* Violet */
+            --border-subtle: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Base Setup --- */
+        * { box-sizing: border-box; }
+        
+        html {
+            scroll-behavior: smooth; /* Smooth scrolling for single-page links */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .mono-font {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            /* Gradient for the main title pop */
+            background: linear-gradient(to right, var(--text-main), var(--color-pop));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            border-left: 4px solid var(--color-pop);
+            padding-left: 15px;
+        }
+
+        p { color: var(--text-muted); font-size: 1.1rem; }
+        a { text-decoration: none; transition: 0.3s; }
+
+        /* --- Header (Glassmorphism & Fixed) --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 14, 23, 0.9); /* Semi-transparent background */
+            backdrop-filter: blur(10px); /* Frosted Glass effect */
+            border-bottom: 1px solid var(--border-subtle);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .logo span { color: var(--color-pop); }
+
+        nav a {
+            color: var(--text-muted);
+            margin-left: 30px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover { color: var(--color-pop); }
+
+        /* --- Layout & Spacing Correction for Fixed Header --- */
+        section {
+            scroll-margin-top: 100px; /* Ensures header does not cover section title */
+            padding: 80px 10%;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            /* Subtle background glow from the secondary violet color */
+            background: radial-gradient(circle at top right, rgba(127, 90, 240, 0.15), transparent 40%);
+        }
+
+        .hero-content { max-width: 600px; }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 35px;
+            background: transparent;
+            color: var(--color-pop);
+            border: 1px solid var(--color-pop);
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--color-pop);
+            color: var(--bg-deep);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); /* Glowing effect */
+        }
+
+        /* --- Services Grid --- */
+        .grid {
+            display: grid;
+            /* Adjusted minmax to 280px for better mobile compatibility */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 40px;
+            border-radius: 4px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--color-pop);
+        }
+
+        .card h3 {
+            color: var(--color-pop);
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+
+        /* --- Contact Section Styling --- */
+        .contact-box {
+            text-align: center;
+            background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            padding: 60px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 30px 10%;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 50px;
+        }
+
+        /* --- Mobile Responsive Fixes --- */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            section { padding: 60px 5%; }
+            
+            /* Stacked Header for Mobile */
+            header {
+                flex-direction: column;
+                height: auto;
+                padding: 15px;
+            }
+            nav {
+                margin-top: 15px;
+                display: flex;
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            nav a { margin-left: 0; font-size: 0.8rem; }
+            
+            /* Adjust scroll margin for the taller mobile header */
+            section { scroll-margin-top: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Arkanis<span>Labs</span></div>
+        <nav>
+            <a href="#approach">Approach</a>
+            <a href="#expertise">Expertise</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <p class="mono-font" style="color: var(--color-pop); margin-bottom: 10px;">// INTELLIGENCE_ARCHITECTED</p>
+            <h1>Intelligence. Proven. <br>Deployed.</h1>
+            <p>
+                We are an engineering-first AI consultancy founded by leaders from <strong>billion-dollar startups</strong> and <strong>frontier LLM research labs</strong>. Our expertise is measured in <strong>millions of daily requests served</strong> and a successful track record of commercializing cutting-edge AI.
+            </p>
+            <a href="#contact" class="btn">Start Assessment</a>
+        </div>
+    </section>
+
+    <section id="approach">
+        <h2>The Methodology</h2>
+        <p style="max-width: 700px; margin-bottom: 40px;">
+            Teams waste millions by making poor decisions before the first line of code is written. We function as your <strong>AI Strategy Partner and Execution Lead</strong>, ensuring every dollar spent leads to a predictable, profitable, and production-ready system.
+        </p>
+
+        <div class="grid" style="margin-top: 0;">
+            <div class="card">
+                <h3>1. Strategic Blueprinting</h3>
+                <p>We define the technical path for any project—whether it's a Proof-of-Concept (PoC), MVP, or enterprise deployment. We <strong>de-risk your investment</strong> by precisely scoping requirements and selecting the optimal model architecture <em>before</em> development begins.</p>
+            </div>
+            <div class="card">
+                <h3>2. Frictionless Integration</h3>
+                <p>Our veteran ML engineers—the same people who shipped some of the world's first GPT-based products—are integrated directly into your team and tech stack. We guarantee <strong>clean, fully tested code</strong> ready for production.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="expertise">
+        <h2>Core Protocols</h2>
+        <p style="max-width: 700px;">
+            We specialize in high-stakes, data-intensive projects where performance and reliability are non-negotiable.
+        </p>
+        <div class="grid">
+            <div class="card">
+                <h3>01. Multi-Agent Pipelines</h3>
+                <p>We design and deploy complex, multi-stage AI systems ready for enterprise scale. Fully <strong>tested, observable, and production-ready</strong> pipelines that manage and execute sophisticated autonomous workflows.</p>
+            </div>
+            <div class="card">
+                <h3>02. Enterprise RAG & LLMs</h3>
+                <p>We turn your messy, proprietary data into a secure and accurate knowledge base. Deploying Retrieval-Augmented Generation (RAG) over challenging datasets, including medical records, legal documents, and <strong>high-resolution maps with complex handwriting.</strong></p>
+            </div>
+            <div class="card">
+                <h3>03. High-Value Predictive Systems</h3>
+                <p>We build models that directly impact your bottom line by quantifying future outcomes. Focus areas include <strong>operational demand forecasting, fraud and anomaly detection, and real-time risk scoring</strong> for critical business processes.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="contact-box">
+            <h2>Ready to Scale?</h2>
+            <p style="margin-bottom: 30px;">
+                The gap between research and reliable deployment is where most projects fail. Our expertise bridges that divide. 
+                We are ready to partner with your team to deliver intelligent systems built on a foundation of real-world success.
+            </p>
+            <a href="mailto:hello@arkanislabs.com" class="btn">Schedule a Consultation</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Arkanis Labs Inc.</p>
+    </footer>
+
+</body>
+</html>
