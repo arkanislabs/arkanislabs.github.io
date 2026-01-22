@@ -1,0 +1,13 @@
+coverage/
+test-results/
+
+.DS_Store
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+.temp/

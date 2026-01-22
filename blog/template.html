@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO Meta Tags -->
+    <title>POST_TITLE | Arkanis Labs Blog</title>
+    <meta name="description" content="POST_DESCRIPTION">
+    <meta name="keywords" content="POST_KEYWORDS">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="POST_TITLE">
+    <meta property="og:description" content="POST_DESCRIPTION">
+    <meta property="og:url" content="https://www.arkanislabs.com/blog/POST_SLUG.html">
+    <meta property="og:site_name" content="Arkanis Labs">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="POST_TITLE">
+    <meta name="twitter:description" content="POST_DESCRIPTION">
+
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- 🎨 THEME CONTROLLER (Digital Alchemist) --- */
+        :root {
+            --bg-deep: #0F0E17;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --text-main: #FFFFFE;
+            --text-muted: #A7A9BE;
+            --color-pop: #00F0FF; /* Neon Cyan */
+            --color-secondary: #7F5AF0; /* Violet */
+            --border-subtle: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Base Setup --- */
+        * { box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .mono-font {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--color-pop);
+            padding-left: 15px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: var(--color-pop);
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 20px; }
+        a { text-decoration: none; transition: 0.3s; }
+
+        /* --- Header (Glassmorphism & Fixed) --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 14, 23, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-subtle);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .logo span { color: var(--color-pop); }
+
+        nav a {
+            color: var(--text-muted);
+            margin-left: 30px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover { color: var(--color-pop); }
+
+        /* --- Blog Post Layout --- */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 120px 20px 60px;
+        }
+
+        .post-header {
+            margin-bottom: 50px;
+        }
+
+        .post-meta {
+            color: var(--color-pop);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .post-meta span {
+            margin-right: 20px;
+        }
+
+        .post-tags {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .tag {
+            display: inline-block;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 5px 15px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--color-pop);
+            font-family: 'Space Mono', monospace;
+            border-radius: 3px;
+        }
+
+        .post-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .post-content p {
+            margin-bottom: 25px;
+        }
+
+        .post-content a {
+            color: var(--color-pop);
+            text-decoration: underline;
+        }
+
+        .post-content a:hover {
+            text-decoration: none;
+        }
+
+        .post-content ul, .post-content ol {
+            margin-bottom: 25px;
+            padding-left: 30px;
+        }
+
+        .post-content li {
+            margin-bottom: 10px;
+            color: var(--text-muted);
+        }
+
+        .post-content code {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9em;
+            color: var(--color-pop);
+        }
+
+        .post-content pre {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 20px;
+            overflow-x: auto;
+            margin-bottom: 25px;
+        }
+
+        .post-content pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: var(--text-main);
+        }
+
+        .post-content blockquote {
+            border-left: 4px solid var(--color-pop);
+            padding-left: 20px;
+            margin: 25px 0;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* --- Back Navigation --- */
+        .back-nav {
+            margin-bottom: 40px;
+        }
+
+        .back-nav a {
+            color: var(--color-pop);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .back-nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 30px 10%;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 80px;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            .container { padding: 140px 20px 60px; }
+
+            header {
+                flex-direction: column;
+                height: auto;
+                padding: 15px;
+            }
+            nav {
+                margin-top: 15px;
+                display: flex;
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            nav a { margin-left: 0; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><a href="/" style="color: inherit; text-decoration: none;">Arkanis<span>Labs</span></a></div>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/#work">What We Do</a>
+            <a href="/blog/">Blog</a>
+            <a href="/#contact">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="back-nav">
+            <a href="/blog/">← Back to Blog</a>
+        </div>
+
+        <article>
+            <div class="post-header">
+                <div class="post-meta">
+                    <span>PUBLISH_DATE</span>
+                    <span>POST_AUTHOR</span>
+                    <span>READING_TIME min read</span>
+                </div>
+                <h1>POST_TITLE</h1>
+                <div class="post-tags">
+                    POST_TAGS
+                </div>
+            </div>
+
+            <div class="post-content">
+                <!-- YOUR CONTENT GOES HERE -->
+                <p>Write your blog post content here. You can use standard HTML elements for formatting:</p>
+
+                <h2>Section Heading</h2>
+                <p>This is a paragraph with some text. You can make text <strong>bold</strong> or <em>italic</em>.</p>
+
+                <h3>Subsection Heading</h3>
+                <p>Here's a list of items:</p>
+                <ul>
+                    <li>Item one</li>
+                    <li>Item two</li>
+                    <li>Item three</li>
+                </ul>
+
+                <p>And here's some inline <code>code</code> within a sentence.</p>
+
+                <pre><code>// Code block example
+function example() {
+    return "Hello, World!";
+}</code></pre>
+
+                <blockquote>This is a blockquote for highlighting important information.</blockquote>
+
+                <p><a href="#">This is a link</a> styled with the theme accent color.</p>
+                <!-- END YOUR CONTENT -->
+            </div>
+        </article>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Arkanis Labs. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
