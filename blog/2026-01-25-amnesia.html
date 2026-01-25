@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO Meta Tags -->
+    <title>The Amnesia Problem: Architecting Long-Term Memory | Arkanis Labs Blog</title>
+    <meta name="description" content="Why AI agents need persistent memory, the dangers of memory poisoning, and why you should start with Postgres, not GraphRAG.">
+    <meta name="keywords" content="AI memory, Zep, Mem0, GraphRAG, vector database, agentic AI, Arkanis Labs">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="The Amnesia Problem: Architecting Long-Term Memory">
+    <meta property="og:description" content="Why AI agents need persistent memory, the dangers of memory poisoning, and why you should start with Postgres.">
+    <meta property="og:url" content="https://www.arkanislabs.com/blog/2026-02-10-long-term-memory.html">
+    <meta property="og:site_name" content="Arkanis Labs">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Amnesia Problem: Architecting Long-Term Memory">
+    <meta name="twitter:description" content="Why AI agents need persistent memory, the dangers of memory poisoning, and why you should start with Postgres.">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* --- 🎨 THEME CONTROLLER (Digital Alchemist) --- */
+        :root {
+            --bg-deep: #0F0E17;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --text-main: #FFFFFE;
+            --text-muted: #A7A9BE;
+            --color-pop: #00F0FF; /* Neon Cyan */
+            --color-secondary: #7F5AF0; /* Violet */
+            --border-subtle: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Base Setup --- */
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+        }
+
+        h1, h2, h3, .mono {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        h1 { 
+            font-size: 3.5rem; 
+            line-height: 1.1; 
+            margin-top: 80px;
+            margin-bottom: 80px; 
+            color: var(--text-main); 
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-top: 240px; /* Extreme break for sections */
+            margin-bottom: 60px;
+            border-left: 4px solid var(--color-pop);
+            padding-left: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h3 {
+            color: var(--color-pop);
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        p { color: var(--text-muted); font-size: 1.2rem; margin-bottom: 40px; }
+        a { text-decoration: none; transition: 0.3s; }
+        ul { list-style: none; padding: 0; margin-bottom: 40px; }
+        li { 
+            color: var(--text-muted); 
+            font-size: 1.15rem; 
+            margin-bottom: 20px; 
+            padding-left: 30px; 
+            position: relative; 
+        }
+        li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--color-pop);
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 25px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 14, 23, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            z-index: 1000;
+        }
+
+        .logo { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 1.6rem; color: var(--text-main); }
+        .logo span { color: var(--color-pop); }
+
+        nav a { color: var(--text-muted); margin-left: 35px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; }
+        nav a:hover { color: var(--color-pop); }
+
+        /* --- Blog Post Layout --- */
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 200px 20px 120px;
+        }
+
+        .post-header { margin-bottom: 120px; }
+        .post-meta { color: var(--color-pop); font-family: 'Space Mono', monospace; font-size: 0.95rem; margin-bottom: 30px; }
+        .tag {
+            display: inline-block;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 18px;
+            margin-right: 12px;
+            font-size: 0.8rem;
+            color: var(--color-pop);
+            font-family: 'Space Mono', monospace;
+            border-radius: 4px;
+        }
+
+        .post-content blockquote {
+            border-left: 4px solid var(--color-pop);
+            padding-left: 30px;
+            margin: 80px 0;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* --- Visualizer Box Styles --- */
+        .visualizer-container {
+            background: #08080C;
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin: 160px 0;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(15, 14, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 80px 10%;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 160px;
+        }
+
+        .alert-box {
+            background: rgba(255, 84, 176, 0.05);
+            border: 1px solid #FF54B0;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 60px 0;
+        }
+        .alert-title {
+            color: #FF54B0;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.8rem; }
+            h2 { margin-top: 140px; font-size: 1.8rem; }
+            .container { padding: 180px 20px 100px; }
+            header { flex-direction: column; padding: 20px; }
+            nav { margin-top: 20px; }
+            .visualizer-container { height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><a href="/" style="color: inherit; text-decoration: none;">Arkanis<span>Labs</span></a></div>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/blog">Blog</a>
+            <a href="#demo">Demo</a>
+            <a href="/#contact">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <article>
+            <div class="post-header">
+                <div class="post-meta">
+                    <span>FEBRUARY 10, 2026</span> • <span class="text-white">ARKANIS LABS</span> • <span>8 MIN READ</span>
+                </div>
+                <h1>The Amnesia Problem: Architecting Long-Term Memory</h1>
+                <div class="mt-8">
+                    <span class="tag">AGENTIC AI</span>
+                    <span class="tag">SYSTEMS DESIGN</span>
+                    <span class="tag">POSTGRES</span>
+                </div>
+            </div>
+
+            <div class="post-content">
+                <p>Imagine hiring a brilliant employee who forgets everything you said yesterday. Every morning, you have to re-explain the project goals, their role, and the nuances of your business. This is the reality of most LLM agents today.</p>
+                <br>
+                <p>To move beyond simple "chatbots" to agents that can self-improve, we need to solve the <strong>Long-Term Memory</strong> problem. We need systems that reduce the cognitive load of prompt management and allow agents to retain context across weeks, not just windows.</p>
+
+                <br><br><br>
+
+                <h2>The Architecture of Memory</h2>
+                
+                <p>Memory isn't just about storage; it's about the lifecycle of a fact. From ingestion to retrieval, and eventually to "forgetting" or compression. Below is the generalized pattern we use at Arkanis to build persistent agents.</p>
+
+                <br>
+
+                <!-- MEMORY CYCLE VISUALIZER -->
+                <div class="visualizer-container border-[#00F0FF]/20 shadow-[0_0_60px_rgba(0,240,255,0.08)]">
+                    <div class="absolute top-6 left-6 z-10 glass-panel p-4 rounded-xl border-[#00F0FF]/20 max-w-[280px]">
+                        <h3 class="mono text-[11px] font-bold text-[#00F0FF] mb-2 uppercase tracking-widest" style="margin:0;">Memory Pattern</h3>
+                        <p class="text-[10px] text-[#A7A9BE] leading-relaxed mb-0">Simulation of facts flowing from Short-term Context to Long-term Store.</p>
+                    </div>
+
+                    <svg id="memory-svg" class="w-full h-full">
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#00F0FF" />
+                            </marker>
+                        </defs>
+                        <!-- Paths -->
+                        <path id="flow-path-user" d="" fill="none" stroke="#00F0FF" stroke-width="1" stroke-opacity="0.2" />
+                        <path id="flow-path-write" d="" fill="none" stroke="#00F0FF" stroke-width="1" stroke-opacity="0.2" stroke-dasharray="5,5" />
+                        <path id="flow-path-read" d="" fill="none" stroke="#7F5AF0" stroke-width="1" stroke-opacity="0.4" />
+                        <!-- Nodes Group -->
+                        <g id="nodes-layer"></g>
+                        <!-- Particles Group -->
+                        <g id="particles-layer"></g>
+                    </svg>
+                </div>
+
+                <br><br><br>
+
+                <h2>It Is Not Bulletproof</h2>
+                
+                <p>While the diagram looks clean, the reality of implementing long-term memory at scale introduces dangerous failure modes that can silently degrade your agent's performance.</p>
+
+                <h3>1. The Conflicting Fact Problem</h3>
+                <p>Consider a medical chronology: A patient reports "acute lower back pain" in January. By June, they report "pain has subsided, now focusing on mobility." If the memory system naively retrieves the January record without weighting for recency or contradiction, the agent might suggest treatment for acute pain that is no longer relevant—potentially confusing the recovery phase.</p>
+
+                <h3>2. Memory Poisoning</h3>
+                <p>If an LLM hallucinates a fact and commits it to long-term memory, that hallucination becomes a "truth" for all future interactions. This self-reinforcing loop can poison a model's behavior permanently.</p>
+
+                <h3>3. The Unbounded Growth & The GraphRAG Tax</h3>
+                <p>In an increasingly crowded space, memory stores grow indefinitely. Techniques like <strong>GraphRAG</strong> (Graph Retrieval-Augmented Generation) offer global reasoning capabilities but are incredibly expensive to scale. We have developed cheaper, compression-based options that discard the need for a heavy knowledge graph while maintaining retrieval accuracy.</p>
+
+                <br><br><br>
+
+                <h2>The Benchmark Mirage</h2>
+                
+                <p>So, how do you choose a stack? If you look at the industry, you'll find a history of squabbling between providers like Zep, Mem0, and others. Benchmark results are inconsistent, often cherry-picked to favor the author's architecture.</p>
+
+                <div class="alert-box">
+                    <span class="alert-title">Warning: Domain Specificity</span>
+                    <p style="margin-bottom:0; font-size: 1rem;">Generic benchmarks rarely reflect production reality. A memory system optimized for chat logs might fail catastrophically on <strong>medical chronologies</strong> or <strong>Text-to-SQL</strong> workflows where exact schema retention is non-negotiable.</p>
+                </div>
+
+                <br><br><br>
+
+                <h2>Call to Action: Start Boring</h2>
+                
+                <p>Do not start with a complex Graph Database. Keep your technical debt low. Tailor a simple open-source solution using <strong>Postgres with pgvector</strong>.</p>
+                
+                <p>Layer on complexity only when you have proven that simple semantic search is insufficient. The most robust systems we build at Arkanis often rely on boring, reliable SQL backends with a thin, intelligent orchestration layer on top.</p>
+
+                <br><br><br>
+
+                <h2>Engineering for Observability</h2>
+                
+                <p>Memory is a product and engineering problem, not just an AI research problem. Assuming your agent is deployed, do you have the observability tools to answer these questions?</p>
+
+                <ul>
+                    <li>Can the system differentiate between <strong>noise</strong> (casual chit-chat) and <strong>facts</strong> (user constraints) that ought to be committed?</li>
+                    <li>Can the system resolve shifting user preferences over time?</li>
+                    <li>Can you "patch" a poisoned memory without wiping the entire user history?</li>
+                </ul>
+
+                <p>If you cannot answer "yes" to these, you are building a black box that will eventually fail.</p>
+
+                <br><br>
+
+                <div id="demo" class="mt-24 p-16 rounded-[40px] bg-gradient-to-br from-[#7F5AF0]/20 to-transparent border border-[#7F5AF0]/40 text-center">
+                    <h3 class="mono text-2xl font-bold text-white mb-6 uppercase tracking-widest">Hire Professionals</h3>
+                    <p class="text-lg text-[#A7A9BE] mb-10 max-w-2xl mx-auto leading-relaxed">
+                        Building persistent agentic memory is difficult. We help teams skip the R&D trap and deploy memory systems that actually work.
+                    </p>
+                    <div class="flex justify-center">
+                        <a href="mailto:inbox@arkanislabs.com" class="px-12 py-6 bg-[#7F5AF0] text-white text-sm font-bold mono rounded-xl hover:bg-[#8e6ef5] transition-all uppercase tracking-[3px] shadow-2xl shadow-violet-900/30">
+                            Contact Arkanis Labs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Arkanis Labs. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            
+            const svg = document.getElementById('memory-svg');
+            const nodesLayer = document.getElementById('nodes-layer');
+            const particlesLayer = document.getElementById('particles-layer');
+            const flowPathUser = document.getElementById('flow-path-user');
+            const flowPathWrite = document.getElementById('flow-path-write');
+            const flowPathRead = document.getElementById('flow-path-read');
+
+            const container = document.querySelector('.visualizer-container');
+            
+            // Initial dimensions
+            let w = container.offsetWidth;
+            let h = container.clientHeight;
+            
+            // Dynamic State
+            let boxW = 120;
+            let boxH = 60;
+            let halfW = 60;
+            let halfH = 30;
+            let cpY_Offset = 80;
+
+            // Define Nodes with relative positions
+            const nodes = [
+                { id: 'user', label: 'USER INPUT', x: 0.15, y: 0.5, color: '#FFFFFF' },
+                { id: 'agent', label: 'AI AGENT', x: 0.45, y: 0.5, color: '#00F0FF' },
+                { id: 'store', label: 'MEMORY STORE', x: 0.85, y: 0.5, color: '#7F5AF0' }
+            ];
+
+            function updateDimensions() {
+                w = container.offsetWidth;
+                h = container.clientHeight;
+                
+                // Responsive Logic
+                const isMobile = w < 768;
+                
+                // Scale boxes based on width availability
+                if (isMobile) {
+                    boxW = Math.min(80, w * 0.22); // Cap width to prevent overlap
+                    boxH = 40;
+                    cpY_Offset = 50; // Tighter curves
+                } else {
+                    boxW = 120;
+                    boxH = 60;
+                    cpY_Offset = 80;
+                }
+                
+                halfW = boxW / 2;
+                halfH = boxH / 2;
+            }
+
+            function drawSystem() {
+                updateDimensions();
+                
+                // Clear nodes
+                while(nodesLayer.firstChild) nodesLayer.removeChild(nodesLayer.firstChild);
+
+                // Draw Nodes
+                nodes.forEach(node => {
+                    const cx = node.x * w;
+                    const cy = node.y * h;
+                    
+                    // Node Box
+                    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                    rect.setAttribute("x", cx - halfW);
+                    rect.setAttribute("y", cy - halfH);
+                    rect.setAttribute("width", boxW);
+                    rect.setAttribute("height", boxH);
+                    rect.setAttribute("rx", "6");
+                    rect.setAttribute("fill", "rgba(15, 14, 23, 0.8)");
+                    rect.setAttribute("stroke", node.color);
+                    rect.setAttribute("stroke-width", "2");
+                    nodesLayer.appendChild(rect);
+
+                    // Text
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", cx);
+                    text.setAttribute("y", cy + (boxH < 50 ? 4 : 5));
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("fill", node.color);
+                    // Adjust font size based on box width
+                    const fontSize = boxW < 90 ? "8px" : "10px";
+                    text.setAttribute("class", `mono font-bold`);
+                    text.setAttribute("font-size", fontSize);
+                    text.textContent = node.label;
+                    nodesLayer.appendChild(text);
+                });
+
+                const cy = 0.5 * h;
+                const userX = nodes[0].x * w + halfW;
+                const agentInX = nodes[1].x * w - halfW;
+                const agentOutX = nodes[1].x * w + halfW;
+                const storeInX = nodes[2].x * w - halfW;
+
+                // Path 1: User -> Agent
+                flowPathUser.setAttribute("d", `M ${userX} ${cy} L ${agentInX} ${cy}`);
+
+                // Path 2: Agent -> Store (WRITE / Top Curve)
+                const cpX = (nodes[1].x * w + nodes[2].x * w) / 2;
+                const cpY_Top = cy - cpY_Offset;
+                flowPathWrite.setAttribute("d", `M ${agentOutX} ${cy - (halfH/3)} Q ${cpX} ${cpY_Top} ${storeInX} ${cy - (halfH/3)}`);
+
+                // Path 3: Store -> Agent (READ / Bottom Curve)
+                const cpY_Bottom = cy + cpY_Offset;
+                flowPathRead.setAttribute("d", `M ${storeInX} ${cy + (halfH/3)} Q ${cpX} ${cpY_Bottom} ${agentOutX} ${cy + (halfH/3)}`);
+            }
+
+            // Animation Loop
+            function spawnParticle() {
+                // Ensure dimensions are current for particle logic
+                // (drawSystem updates globals boxW etc)
+                
+                const particle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                particle.setAttribute("r", "3");
+                particle.setAttribute("fill", "#FFFFFF"); // User input color
+                particlesLayer.appendChild(particle);
+
+                let progress = 0;
+                const speed = 0.008 + Math.random() * 0.004;
+                
+                // Recalculate critical points based on current globals
+                const cy = 0.5 * h;
+                const userX = nodes[0].x * w + halfW;
+                const agentInX = nodes[1].x * w - halfW;
+                const agentOutX = nodes[1].x * w + halfW;
+                const storeInX = nodes[2].x * w - halfW;
+                
+                const cpX = (nodes[1].x * w + nodes[2].x * w) / 2;
+                const cpY_Top = cy - cpY_Offset;
+                const cpY_Bottom = cy + cpY_Offset;
+                const yOffset = halfH/3;
+
+                const animate = () => {
+                    progress += speed;
+                    if (progress > 2.5) { // Extended lifecycle
+                        if(particlesLayer.contains(particle)) particlesLayer.removeChild(particle);
+                        return;
+                    }
+
+                    let x, y;
+
+                    // 1. User -> Agent
+                    if (progress < 1.0) {
+                        const t = progress; 
+                        x = userX + (agentInX - userX) * t;
+                        y = cy;
+                    } 
+                    // 2. Agent -> Store (WRITE)
+                    else if (progress >= 1.0 && progress < 1.75) {
+                        const t = (progress - 1.0) / 0.75; // Normalize 0-1
+                        
+                        const P0 = {x: agentOutX, y: cy - yOffset};
+                        const P1 = {x: cpX, y: cpY_Top};
+                        const P2 = {x: storeInX, y: cy - yOffset};
+                        
+                        x = Math.pow(1-t, 2) * P0.x + 2 * (1-t) * t * P1.x + Math.pow(t, 2) * P2.x;
+                        y = Math.pow(1-t, 2) * P0.y + 2 * (1-t) * t * P1.y + Math.pow(t, 2) * P2.y;
+                        
+                        particle.setAttribute("fill", "#00F0FF"); // Write Color
+                    } 
+                    // 3. Store -> Agent (READ)
+                    else {
+                        const t = (progress - 1.75) / 0.75; // Normalize 0-1
+                        
+                        const P0 = {x: storeInX, y: cy + yOffset};
+                        const P1 = {x: cpX, y: cpY_Bottom};
+                        const P2 = {x: agentOutX, y: cy + yOffset};
+
+                        x = Math.pow(1-t, 2) * P0.x + 2 * (1-t) * t * P1.x + Math.pow(t, 2) * P2.x;
+                        y = Math.pow(1-t, 2) * P0.y + 2 * (1-t) * t * P1.y + Math.pow(t, 2) * P2.y;
+
+                        particle.setAttribute("fill", "#7F5AF0"); // Read Color
+                    }
+
+                    particle.setAttribute("cx", x);
+                    particle.setAttribute("cy", y);
+                    requestAnimationFrame(animate);
+                };
+                requestAnimationFrame(animate);
+            }
+
+            // Init
+            drawSystem();
+            window.addEventListener('resize', drawSystem);
+            setInterval(spawnParticle, 1200);
+        });
+    </script>
+</body>
+</html>
