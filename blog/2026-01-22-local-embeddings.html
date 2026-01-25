@@ -60,8 +60,8 @@
         h1 { 
             font-size: 3.5rem; 
             line-height: 1.1; 
-            margin-top: 60px;
-            margin-bottom: 60px; 
+            margin-top: 80px;
+            margin-bottom: 80px; 
             color: var(--text-main); 
         }
 
@@ -281,9 +281,12 @@
                     </div>
 
                     <svg id="visualizer-svg" class="w-full h-full cursor-crosshair">
-                        <g id="connections-layer"></g>
-                        <g id="points-layer"></g>
-                        <g id="labels-layer"></g>
+                        <!-- Group for zooming -->
+                        <g id="main-group" style="transform-origin: center; transition: transform 0.3s ease-out;">
+                            <g id="connections-layer"></g>
+                            <g id="points-layer"></g>
+                            <g id="labels-layer"></g>
+                        </g>
                     </svg>
 
                     <!-- Tooltip -->
@@ -302,8 +305,9 @@
                             <span class="text-[10px] text-[#A7A9BE] mono uppercase tracking-tighter">Nodes: 117</span>
                         </div>
                         <div class="flex gap-4">
-                            <button class="p-1 hover:text-[#00F0FF] transition-colors"><i data-lucide="zoom-in" class="w-4 h-4"></i></button>
-                            <button class="p-1 hover:text-[#00F0FF] transition-colors"><i data-lucide="zoom-out" class="w-4 h-4"></i></button>
+                            <!-- Added IDs for JS targeting -->
+                            <button id="btn-zoom-in" class="p-1 hover:text-[#00F0FF] transition-colors"><i data-lucide="zoom-in" class="w-4 h-4"></i></button>
+                            <button id="btn-zoom-out" class="p-1 hover:text-[#00F0FF] transition-colors"><i data-lucide="zoom-out" class="w-4 h-4"></i></button>
                         </div>
                     </div>
                 </div>
@@ -342,11 +346,15 @@
             lucide.createIcons();
             
             const svg = document.getElementById('visualizer-svg');
+            const mainGroup = document.getElementById('main-group');
             const pointsLayer = document.getElementById('points-layer');
             const connectionsLayer = document.getElementById('connections-layer');
             const labelsLayer = document.getElementById('labels-layer');
             const tooltip = document.getElementById('tooltip');
             
+            // Zoom State
+            let currentZoom = 1;
+
             const clusters = [
                 { id: 1, name: 'User Intent', color: '#00F0FF', count: 40, center: { x: 0.3, y: 0.4 } },
                 { id: 2, name: 'Tech Docs', color: '#7F5AF0', count: 35, center: { x: 0.7, y: 0.5 } },
@@ -359,71 +367,113 @@
                 "Benchmark accuracy", "Vector DB indexing", "Semantic search logic"
             ];
 
-            const pts = [];
-            const container = document.querySelector('.visualizer-container');
-            // FIX: Ensure JS uses the actual container dimensions
-            const w = container.offsetWidth;
-            const h = container.clientHeight; // Matches CSS 600px
+            const drawGraph = () => {
+                // Clear existing content
+                while(pointsLayer.firstChild) pointsLayer.removeChild(pointsLayer.firstChild);
+                while(connectionsLayer.firstChild) connectionsLayer.removeChild(connectionsLayer.firstChild);
+                while(labelsLayer.firstChild) labelsLayer.removeChild(labelsLayer.firstChild);
 
-            clusters.forEach(cluster => {
-                const clusterPts = [];
-                for (let i = 0; i < cluster.count; i++) {
-                    // Spread restored to 220 for spacious layout
-                    const x = (cluster.center.x * w) + (Math.random() - 0.5) * 220;
-                    const y = (cluster.center.y * h) + (Math.random() - 0.5) * 220;
-                    const pt = {
-                        id: `VEC_${Math.floor(Math.random() * 999)}`,
-                        x, y, color: cluster.color,
-                        content: contents[Math.floor(Math.random() * contents.length)]
-                    };
-                    pts.push(pt);
-                    clusterPts.push(pt);
+                const container = document.querySelector('.visualizer-container');
+                const w = container.offsetWidth;
+                const h = container.clientHeight;
+                const isMobile = w < 768;
 
-                    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    circle.setAttribute("cx", x); circle.setAttribute("cy", y); circle.setAttribute("r", "3.5");
-                    circle.setAttribute("fill", cluster.color); circle.setAttribute("fill-opacity", "0.6");
-                    circle.setAttribute("class", "glow-point transition-all duration-300");
-                    
-                    circle.addEventListener('mouseenter', () => {
-                        circle.setAttribute("r", "7");
-                        circle.setAttribute("fill-opacity", "1");
-                        tooltip.style.left = `${x + 25}px`;
-                        tooltip.style.top = `${y - 40}px`;
-                        tooltip.classList.remove('hidden');
-                        document.getElementById('tooltip-id').textContent = pt.id;
-                        document.getElementById('tooltip-content').textContent = pt.content;
-                        document.getElementById('tooltip-sim').textContent = (0.85 + Math.random() * 0.1).toFixed(3);
-                    });
+                // Adjust spread and radius for mobile vs desktop
+                const spread = isMobile ? Math.min(w * 0.25, 100) : 220;
+                const pointRadius = isMobile ? 2.5 : 3.5;
+                const hoverRadius = isMobile ? 5 : 7;
 
-                    circle.addEventListener('mouseleave', () => {
-                        circle.setAttribute("r", "3.5");
-                        circle.setAttribute("fill-opacity", "0.6");
-                        tooltip.classList.add('hidden');
-                    });
-                    pointsLayer.appendChild(circle);
-                }
+                const pts = [];
 
-                // Connections
-                for(let j = 0; j < 10; j++) {
-                    const p1 = clusterPts[Math.floor(Math.random() * clusterPts.length)];
-                    const p2 = clusterPts[Math.floor(Math.random() * clusterPts.length)];
-                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("x1", p1.x); line.setAttribute("y1", p1.y);
-                    line.setAttribute("x2", p2.x); line.setAttribute("y2", p2.y);
-                    line.setAttribute("stroke", cluster.color); line.setAttribute("stroke-width", "0.5");
-                    line.setAttribute("stroke-opacity", "0.15");
-                    connectionsLayer.appendChild(line);
-                }
+                clusters.forEach(cluster => {
+                    const clusterPts = [];
+                    for (let i = 0; i < cluster.count; i++) {
+                        // Responsive spread logic
+                        const x = (cluster.center.x * w) + (Math.random() - 0.5) * spread;
+                        const y = (cluster.center.y * h) + (Math.random() - 0.5) * spread;
+                        
+                        const pt = {
+                            id: `VEC_${Math.floor(Math.random() * 999)}`,
+                            x, y, color: cluster.color,
+                            content: contents[Math.floor(Math.random() * contents.length)]
+                        };
+                        pts.push(pt);
+                        clusterPts.push(pt);
 
-                const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                label.setAttribute("x", cluster.center.x * w);
-                label.setAttribute("y", (cluster.center.y * h) - 140);
-                label.setAttribute("fill", cluster.color);
-                label.setAttribute("class", "mono text-[11px] font-bold opacity-40 uppercase pointer-events-none tracking-[4px]");
-                label.setAttribute("text-anchor", "middle");
-                label.textContent = cluster.name;
-                labelsLayer.appendChild(label);
+                        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        circle.setAttribute("cx", x); circle.setAttribute("cy", y); 
+                        circle.setAttribute("r", pointRadius);
+                        circle.setAttribute("fill", cluster.color); circle.setAttribute("fill-opacity", "0.6");
+                        circle.setAttribute("class", "glow-point transition-all duration-300");
+                        
+                        circle.addEventListener('mouseenter', () => {
+                            circle.setAttribute("r", hoverRadius);
+                            circle.setAttribute("fill-opacity", "1");
+                            tooltip.style.left = `${x + 25}px`;
+                            tooltip.style.top = `${y - 40}px`;
+                            tooltip.classList.remove('hidden');
+                            document.getElementById('tooltip-id').textContent = pt.id;
+                            document.getElementById('tooltip-content').textContent = pt.content;
+                            document.getElementById('tooltip-sim').textContent = (0.85 + Math.random() * 0.1).toFixed(3);
+                        });
+
+                        circle.addEventListener('mouseleave', () => {
+                            circle.setAttribute("r", pointRadius);
+                            circle.setAttribute("fill-opacity", "0.6");
+                            tooltip.classList.add('hidden');
+                        });
+                        pointsLayer.appendChild(circle);
+                    }
+
+                    // Connections
+                    for(let j = 0; j < 10; j++) {
+                        const p1 = clusterPts[Math.floor(Math.random() * clusterPts.length)];
+                        const p2 = clusterPts[Math.floor(Math.random() * clusterPts.length)];
+                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        line.setAttribute("x1", p1.x); line.setAttribute("y1", p1.y);
+                        line.setAttribute("x2", p2.x); line.setAttribute("y2", p2.y);
+                        line.setAttribute("stroke", cluster.color); line.setAttribute("stroke-width", "0.5");
+                        line.setAttribute("stroke-opacity", "0.15");
+                        connectionsLayer.appendChild(line);
+                    }
+
+                    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    label.setAttribute("x", cluster.center.x * w);
+                    label.setAttribute("y", (cluster.center.y * h) - (isMobile ? 80 : 140));
+                    label.setAttribute("fill", cluster.color);
+                    label.setAttribute("class", "mono font-bold opacity-40 uppercase pointer-events-none tracking-[4px]");
+                    label.setAttribute("font-size", isMobile ? "9px" : "11px");
+                    label.setAttribute("text-anchor", "middle");
+                    label.textContent = cluster.name;
+                    labelsLayer.appendChild(label);
+                });
+            };
+
+            // Initial Draw
+            drawGraph();
+
+            // Re-draw on Resize with debounce
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(drawGraph, 100);
             });
+
+            // Zoom Listeners
+            const btnZoomIn = document.getElementById('btn-zoom-in');
+            const btnZoomOut = document.getElementById('btn-zoom-out');
+
+            if(btnZoomIn && btnZoomOut) {
+                btnZoomIn.addEventListener('click', () => {
+                    currentZoom = Math.min(currentZoom + 0.2, 3);
+                    mainGroup.style.transform = `scale(${currentZoom})`;
+                });
+
+                btnZoomOut.addEventListener('click', () => {
+                    currentZoom = Math.max(currentZoom - 0.2, 0.5);
+                    mainGroup.style.transform = `scale(${currentZoom})`;
+                });
+            }
         });
     </script>
 </body>
