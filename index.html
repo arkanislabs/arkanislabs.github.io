@@ -1,1056 +1,597 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arkanis Labs | AI & ML Consulting</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        /* --- 🎨 THEME CONTROLLER (Digital Alchemist) --- */
-        :root {
-            --bg-deep: #0F0E17;
-            --bg-card: rgba(255, 255, 255, 0.05);
-            --text-main: #FFFFFE;
-            --text-muted: #A7A9BE;
-            --color-pop: #00F0FF; /* Neon Cyan */
-            --color-secondary: #7F5AF0; /* Violet */
-            --border-subtle: rgba(255, 255, 255, 0.1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arkanis Labs | AI Systems Engineering</title>
+  <meta name="description" content="Arkanis Labs builds AI systems for venture-backed teams. Data engineering, LLM agents, recommender systems, custom model training & deployment." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --bg-elevated: #111113;
+      --bg-card: #161619;
+      --border: #23232a;
+      --border-hover: #36363f;
+      --text-primary: #e8e8ed;
+      --text-secondary: #8a8a9a;
+      --text-muted: #55555f;
+      --accent: #c8f031;
+      --accent-dim: #a0c020;
+      --accent-glow: rgba(200, 240, 49, 0.08);
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Instrument Sans', -apple-system, sans-serif;
+    }
 
-        /* --- Base Setup --- */
-        * { box-sizing: border-box; }
-        
-        html {
-            scroll-behavior: smooth; /* Smooth scrolling for single-page links */
-        }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
+    html { scroll-behavior: smooth; font-size: 16px; }
 
-        h1, h2, h3, .mono-font {
-            font-family: 'Space Mono', monospace;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--sans);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
 
-        h1 {
-            font-size: 3.5rem;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            /* Gradient for the main title pop */
-            background: linear-gradient(to right, var(--text-main), var(--color-pop));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    ::selection {
+      background: var(--accent);
+      color: var(--bg);
+    }
 
-        h2 {
-            font-size: 2rem;
-            color: var(--text-main);
-            margin-bottom: 10px;
-            border-left: 4px solid var(--color-pop);
-            padding-left: 15px;
-        }
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 11, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
 
-        p { color: var(--text-muted); font-size: 1.1rem; }
-        a { text-decoration: none; transition: 0.3s; }
+    .logo {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
 
-        /* --- Header (Glassmorphism & Fixed) --- */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(15, 14, 23, 0.9); /* Semi-transparent background */
-            backdrop-filter: blur(10px); /* Frosted Glass effect */
-            border-bottom: 1px solid var(--border-subtle);
-            z-index: 1000;
-        }
+    .logo span { color: var(--accent); }
 
-        .logo {
-            font-family: 'Space Mono', monospace;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--text-main);
-        }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
 
-        .logo span { color: var(--color-pop); }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
 
-        nav a {
-            color: var(--text-muted);
-            margin-left: 30px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+    .nav-links a:hover { color: var(--text-primary); }
 
-        nav a:hover { color: var(--color-pop); }
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 2rem 6rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
 
-        /* --- Layout & Spacing Correction for Fixed Header --- */
-        section {
-            scroll-margin-top: 100px; /* Ensures header does not cover section title */
-            padding: 80px 10%;
-        }
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards;
+    }
 
-        /* --- Hero Section --- */
-        .hero {
-            height: 100vh;
-            min-height: 600px;
-            display: flex;
-            align-items: center;
-            /* Subtle background glow from the secondary violet color */
-            background: radial-gradient(circle at top right, rgba(127, 90, 240, 0.15), transparent 40%);
-        }
+    .hero h1 {
+      font-family: var(--sans);
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 1.75rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+    }
 
-        .hero-content { max-width: 600px; }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.2s forwards;
+    }
 
-        /* --- Buttons --- */
-        .btn {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 15px 35px;
-            background: transparent;
-            color: var(--color-pop);
-            border: 1px solid var(--color-pop);
-            font-family: 'Space Mono', monospace;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.85rem 1.75rem;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.3s forwards;
+    }
 
-        .btn:hover {
-            background: var(--color-pop);
-            color: var(--bg-deep);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); /* Glowing effect */
-        }
+    .hero-cta:hover {
+      background: var(--accent-dim);
+      transform: translateY(-1px);
+    }
 
-        /* --- Services Grid --- */
-        .grid {
-            display: grid;
-            /* Adjusted minmax to 280px for better mobile compatibility */
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 30px;
-            margin-top: 50px;
-        }
+    .hero-cta::after {
+      content: '→';
+      transition: transform 0.2s;
+    }
 
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            padding: 40px;
-            border-radius: 4px;
-            transition: transform 0.3s, border-color 0.3s;
-        }
+    .hero-cta:hover::after { transform: translateX(3px); }
 
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--color-pop);
-        }
+    /* SECTIONS */
+    section {
+      padding: 6rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
 
-        .card h3 {
-            color: var(--color-pop);
-            margin-top: 0;
-            font-size: 1.4rem;
-        }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
 
-        /* --- Contact Section Styling --- */
-        .contact-box {
-            text-align: center;
-            background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-            padding: 60px;
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-        }
+    section > h2 {
+      font-family: var(--sans);
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
 
-        /* --- Footer --- */
-        footer {
-            padding: 30px 10%;
-            border-top: 1px solid var(--border-subtle);
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-top: 50px;
-        }
+    section > .section-intro {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      max-width: 640px;
+      margin-bottom: 3rem;
+      line-height: 1.75;
+    }
 
-        /* --- Mobile Responsive Fixes --- */
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            section { padding: 60px 5%; }
-            
-            /* Stacked Header for Mobile */
-            header {
-                flex-direction: column;
-                height: auto;
-                padding: 15px;
-            }
-            nav {
-                margin-top: 15px;
-                display: flex;
-                gap: 20px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            nav a { margin-left: 0; font-size: 0.8rem; }
-            
-            /* Adjust scroll margin for the taller mobile header */
-            section { scroll-margin-top: 140px; }
-        }
+    /* DIVIDER */
+    .divider {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
 
-        /* --- 🎮 GAME SECTION: NEURAL SURVIVOR --- */
-        .game-section {
-            --game-bg: #050510;
-            --game-accent: var(--color-pop);
-            --game-danger: #ff0055;
-            --game-ui-bg: rgba(15, 14, 23, 0.96);
-            font-family: 'Space Mono', monospace;
-        }
+    .divider hr {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
 
-        .game-shell {
-            margin-top: 25px;
-            border-radius: 8px;
-            border: 1px solid var(--border-subtle);
-            background: radial-gradient(circle at top, rgba(127,90,240,0.15), rgba(0,0,0,0.9));
-            overflow: hidden;
-        }
+    /* CAPABILITIES GRID */
+    .cap-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
 
-        .game-frame {
-            position: relative;
-            width: 100%;
-            height: 600px;
-            max-height: 70vh;
-            background-color: var(--game-bg);
-            touch-action: none;
-            overflow: hidden;
-        }
+    .cap-item {
+      background: var(--bg-card);
+      padding: 2rem;
+      transition: background 0.25s;
+    }
 
-        @media (max-width: 768px) {
-            .game-frame {
-                height: 420px;
-            }
-        }
+    .cap-item:hover { background: var(--bg-elevated); }
 
-        /* Canvas */
-        .game-section #gameCanvas {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
+    .cap-item h3 {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: var(--text-primary);
+    }
 
-        /* Scanlines overlay */
-        .game-section #scanlines {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 900;
-            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.1) 50%);
-            background-size: 100% 4px;
-        }
+    .cap-item p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
 
-        /* UI layers */
-        .game-section .ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
+    /* PROCESS */
+    .process-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
 
-        /* HUD */
-        .game-section .hud {
-            justify-content: flex-start;
-            padding: 20px;
-            box-sizing: border-box;
-            flex-direction: row;
-            justify-content: space-between;
-            height: auto;
-            align-items: flex-start;
-            z-index: 20;
-        }
+    .step {
+      display: grid;
+      grid-template-columns: 3.5rem 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
 
-        .game-section .stat-box {
-            text-shadow: 0 0 5px var(--game-accent);
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-            color: var(--text-main);
-        }
+    .step-num {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-glow);
+      width: 3rem;
+      height: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid rgba(200, 240, 49, 0.15);
+      flex-shrink: 0;
+    }
 
-        /* Bars */
-        .game-section .bar-container {
-            width: 200px;
-            background: #222;
-            height: 20px;
-            border: 1px solid #444;
-            margin-bottom: 5px;
-            position: relative;
-        }
+    .step-content h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
 
-        .game-section .bar-fill {
-            height: 100%;
-            width: 0%;
-            transition: width 0.2s;
-        }
+    .step-content p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
 
-        .game-section #xpBar {
-            background: #00aaff;
-            box-shadow: 0 0 10px #00aaff;
-        }
+    .step-detail {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      padding-left: 0.75rem;
+      border-left: 2px solid var(--border);
+    }
 
-        .game-section #hpBar {
-            background: #ff0055;
-            box-shadow: 0 0 10px #ff0055;
-        }
+    /* WHO WE ARE */
+    .team-block {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2.5rem;
+      background: var(--bg-card);
+    }
 
-        /* Menus */
-        .game-section .menu {
-            background: var(--game-ui-bg);
-            border: 2px solid var(--game-accent);
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            pointer-events: auto;
-            max-width: 500px;
-            width: 85%;
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
-            position: relative;
-            z-index: 50;
-        }
+    .team-block p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
 
-        .game-section .menu h1 {
-            margin-top: 0;
-            color: var(--game-accent);
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
+    .team-block p:last-child { margin-bottom: 0; }
 
-        .game-section .menu p {
-            color: var(--text-muted);
-            margin-bottom: 25px;
-            line-height: 1.4;
-            font-size: 0.95rem;
-        }
+    .team-traits {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
 
-        /* Game buttons (scoped so they don't override site buttons) */
-        .game-section button {
-            background: transparent;
-            border: 1px solid var(--game-accent);
-            color: var(--game-accent);
-            padding: 12px 25px;
-            font-family: 'Space Mono', monospace;
-            font-size: 1.0rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin: 5px;
-            text-transform: uppercase;
-        }
+    .trait {
+      background: var(--bg-card);
+      padding: 1.5rem;
+    }
 
-        .game-section button:hover {
-            background: var(--game-accent);
-            color: #000;
-            box-shadow: 0 0 20px var(--game-accent);
-        }
+    .trait h4 {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
 
-        /* Upgrades */
-        .game-section .upgrade-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 50vh;
-            overflow-y: auto;
-        }
+    .trait p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
 
-        .game-section .upgrade-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid #444;
-            padding: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: left;
-        }
+    /* CLIENTS */
+    .client-context {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
 
-        .game-section .upgrade-card:hover {
-            border-color: var(--game-accent);
-            background: rgba(0, 240, 255, 0.08);
-        }
+    .client-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2rem;
+      background: var(--bg-card);
+      transition: border-color 0.25s;
+    }
 
-        .game-section .upgrade-title {
-            color: var(--game-accent);
-            font-weight: bold;
-            font-size: 1.05rem;
-        }
+    .client-card:hover { border-color: var(--border-hover); }
 
-        .game-section .upgrade-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
+    .client-card h3 {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
 
-        /* Joystick */
-        .game-section #joystick-zone {
-            position: absolute;
-            bottom: 40px;
-            left: 40px;
-            width: 120px;
-            height: 120px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            pointer-events: auto;
-            display: none;
-            z-index: 100;
-        }
+    .client-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
 
-        .game-section #joystick-knob {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 240, 255, 0.5);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
+    /* CTA */
+    .cta-section {
+      text-align: left;
+      padding-top: 4rem;
+      padding-bottom: 8rem;
+    }
 
-        /* Game responsive tweaks */
-        @media (max-width: 600px) {
-            .game-section .hud {
-                flex-direction: column;
-                font-size: 0.8rem;
-                padding: 10px;
-            }
-            .game-section .bar-container {
-                width: 150px;
-            }
-            .game-section .menu {
-                padding: 20px;
-                width: 90%;
-            }
-            .game-section .menu h1 {
-                font-size: 1.5rem;
-            }
-            .game-section #joystick-zone {
-                display: block; /* Always show joystick on small screens */
-            }
-        }
-    </style>
+    .cta-section h2 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      max-width: 540px;
+      margin-bottom: 2rem;
+      line-height: 1.75;
+    }
+
+    .cta-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.85rem 1.75rem;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .cta-email:hover {
+      background: var(--accent-dim);
+      transform: translateY(-1px);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 680px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { gap: 1.25rem; }
+      .hero { padding: 7rem 1.25rem 4rem; }
+      section { padding: 4rem 1.25rem; }
+      .divider { padding: 0 1.25rem; }
+      .cap-grid { grid-template-columns: 1fr; }
+      .client-context { grid-template-columns: 1fr; }
+      .team-traits { grid-template-columns: 1fr; }
+      .step { grid-template-columns: 2.5rem 1fr; gap: 1rem; }
+      .step-num { width: 2.5rem; height: 2.5rem; font-size: 0.7rem; }
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">Arkanis<span>Labs</span></div>
-        <nav>
-            <a href="#approach">Approach</a>
-            <a href="#expertise">Expertise</a>
-            <a href="#labs-playground">Playground</a>
-            <a href="#contact">Contact</a>
-        </nav>
-    </header>
+  <nav>
+    <a href="/" class="logo">Arkanis<span>Labs</span></a>
+    <ul class="nav-links">
+      <li><a href="#capabilities">Capabilities</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#team">Team</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 
-    <section class="hero">
-        <div class="hero-content">
-            <p class="mono-font" style="color: var(--color-pop); margin-bottom: 10px;">// AI that earns it's keep.</p>
-            <h1>Intelligence. Proven. <br>Deployed.</h1>
-            <p>
-                We are an engineering-first AI consultancy founded by leaders from <strong>billion-dollar startups</strong> and <strong>frontier LLM research labs</strong>. Our expertise is measured in <strong>millions of daily requests served</strong> and a successful track record of commercializing cutting-edge AI with proven ROI.
-            </p>
-            <a href="#contact" class="btn">Start Assessment</a>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-tag">AI Systems Engineering</div>
+    <h1>We build the AI systems that venture-backed teams ship to production.</h1>
+    <p>
+      Arkanis Labs is a systems design and implementation shop. We work with VC firms, their portfolio companies, and early-stage startups to build AI infrastructure that survives contact with real users. In 2026 alone, teams we've worked with have raised over $7M USD off proof-of-concept projects we helped build.
+    </p>
+    <a href="#contact" class="hero-cta">Get in Touch</a>
+  </header>
+
+  <div class="divider"><hr /></div>
+
+  <!-- CAPABILITIES -->
+  <section id="capabilities">
+    <div class="section-label">What We Build</div>
+    <h2>Practical systems, not science projects.</h2>
+    <p class="section-intro">
+      We focus on the engineering work that turns AI from a slide deck into something customers actually use. If it involves data moving through a system and a model making decisions, it's probably in our wheelhouse.
+    </p>
+    <div class="cap-grid">
+      <div class="cap-item">
+        <h3>Data Engineering</h3>
+        <p>Pipelines, ETL, schema design, and the plumbing that makes everything else possible. Clean data in, useful data out. We work across warehouse platforms and build systems that don't silently rot.</p>
+      </div>
+      <div class="cap-item">
+        <h3>LLM Agents & Workflows</h3>
+        <p>Task-specific agents with structured memory, tool use, and clear accountability. Multi-agent orchestration when the problem calls for it. We build agents that do real work—not chatbots with delusions of competence.</p>
+      </div>
+      <div class="cap-item">
+        <h3>Recommender Systems</h3>
+        <p>Ranking, personalization, and discovery systems built for your specific domain. From cold-start strategies to production feedback loops that actually improve over time.</p>
+      </div>
+      <div class="cap-item">
+        <h3>Custom Model Training & Deployment</h3>
+        <p>Fine-tuning, distillation, and purpose-built models deployed to environments that make sense for your constraints. We handle the full path from research code to production monitoring.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr /></div>
+
+  <!-- WHO WE WORK WITH -->
+  <section id="clients">
+    <div class="section-label">Who We Work With</div>
+    <h2>Built for teams that move fast.</h2>
+    <p class="section-intro">
+      Our clients are venture-backed companies at the stage where AI is a core bet, not a side experiment. We plug in where you need us.
+    </p>
+    <div class="client-context">
+      <div class="client-card">
+        <h3>Startups & Portfolio Companies</h3>
+        <p>You need to ship an AI feature and don't have the team to build it yet. We integrate with your engineers, write production code, and help you hit the milestone that unlocks the next round.</p>
+      </div>
+      <div class="client-card">
+        <h3>VC Firms & Advisors</h3>
+        <p>You need technical diligence on a deal, or a portfolio company needs hands-on engineering help. We provide implementation specialists for greenfield projects and advisory support on hiring, architecture, and technical strategy.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr /></div>
+
+  <!-- PROCESS -->
+  <section id="process">
+    <div class="section-label">How We Work</div>
+    <h2>Designed to build trust fast.</h2>
+    <p class="section-intro">
+      Most AI engagements fail because the scope is wrong, not because the engineering is hard. Our process is built to catch that early and move quickly once we know the problem is real.
+    </p>
+    <div class="process-steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3>Discovery</h3>
+          <p>A focused 1–2 week period where we define the technical path and start writing code. We're typically making meaningful contributions within the first few days—not spending weeks on a strategy deck.</p>
+          <div class="step-detail">If we can't solve the problem, we say so. No commitment trap—either party can walk away.</div>
         </div>
-    </section>
-
-    <section id="approach">
-        <h2>The Methodology</h2>
-        <p style="max-width: 700px; margin-bottom: 40px;">
-            Teams waste millions by making poor decisions before the first line of code is written. We function as your <strong>AI Strategy Partner and Execution Lead</strong>, ensuring every dollar spent leads to a predictable, profitable, and production-ready system.
-        </p>
-
-        <div class="grid" style="margin-top: 0;">
-            <div class="card">
-                <h3>1. Strategic Blueprinting</h3>
-                <p>We define the technical path for any project—whether it's a Proof-of-Concept (PoC), MVP, or enterprise deployment. We <strong>de-risk your investment</strong> by precisely scoping requirements and selecting the optimal model architecture <em>before</em> development begins.</p>
-            </div>
-            <div class="card">
-                <h3>2. Frictionless Integration</h3>
-                <p>Our veteran ML engineers—the same people who shipped some of the world's first GPT-based products—are integrated directly into your team and tech stack. We guarantee <strong>clean, fully tested code</strong> ready for production.</p>
-            </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3>Scoped Delivery</h3>
+          <p>Concrete deliverables with clear timelines and pass/fail criteria. You know what you're getting, when you're getting it, and how to evaluate whether it works. No ambiguous "ongoing development."</p>
         </div>
-    </section>
-
-    <section id="expertise">
-        <h2>Core Protocols</h2>
-        <p style="max-width: 700px;">
-            We specialize in high-stakes, data-intensive projects where performance and reliability are non-negotiable.
-        </p>
-        <div class="grid">
-            <div class="card">
-                <h3>01. Multi-Agent Pipelines</h3>
-                <p>We design and deploy complex, multi-stage AI systems ready for enterprise scale. Fully <strong>tested, observable, and production-ready</strong> pipelines that manage and execute sophisticated autonomous workflows.</p>
-            </div>
-            <div class="card">
-                <h3>02. Enterprise RAG & LLMs</h3>
-                <p>We turn your messy, proprietary data into a secure and accurate knowledge base. Deploying Retrieval-Augmented Generation (RAG) over challenging datasets, including medical records, legal documents, and <strong>high-resolution maps with complex handwriting.</strong></p>
-            </div>
-            <div class="card">
-                <h3>03. High-Value Predictive Systems</h3>
-                <p>We build models that directly impact your bottom line by quantifying future outcomes. Focus areas include <strong>operational demand forecasting, fraud and anomaly detection, and real-time risk scoring</strong> for critical business processes.</p>
-            </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3>Partnership</h3>
+          <p>For teams that need sustained support, we move into a partnership model: priority access to our engineers, ongoing strategy consultations, and the continuity of working with people who already know your systems inside out.</p>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- 🧪 Labs Playground: Game Section -->
-    <section id="labs-playground" class="game-section">
-        <h2>Labs Playground: Neural Survivor</h2>
-        <p style="max-width: 700px;">
-            A minimal, browser-based survival prototype built around the language of ML systems. 
-            Pilot a model instance, eliminate noise, and tune your hyperparameters in real-time.
-        </p>
+  <div class="divider"><hr /></div>
 
-        <div class="game-shell">
-            <div class="game-frame" id="gameFrame">
-                <div id="scanlines"></div>
-                <canvas id="gameCanvas"></canvas>
+  <!-- TEAM -->
+  <section id="team">
+    <div class="section-label">Who We Are</div>
+    <h2>Engineers who build because they can't stop.</h2>
+    <div class="team-block">
+      <p>
+        We hire engineers with deep system design instincts who use AI tooling as leverage—not as a substitute for understanding the problem. The kind of people who know when the model is wrong before the metrics tell them, because they've built enough systems to have intuition about how things break.
+      </p>
+      <p>
+        Everyone here has covered the full deployment stack, from exploratory research code to production monitoring and continuous improvement. We're pragmatic tinkerers who build for the sake of building and take genuine pride in the craft.
+      </p>
+    </div>
+    <div class="team-traits">
+      <div class="trait">
+        <h4>System Design</h4>
+        <p>Architecture-first thinking. We design systems that hold up under real load and real edge cases, not just happy-path demos.</p>
+      </div>
+      <div class="trait">
+        <h4>AI-Augmented, Not AI-Dependent</h4>
+        <p>Our engineers use AI tooling to move fast without outsourcing their judgment. The tools amplify; they don't replace the thinking.</p>
+      </div>
+      <div class="trait">
+        <h4>Full Stack ML</h4>
+        <p>From research notebooks to production pipelines, monitoring dashboards to rollback strategies. No hand-off gaps.</p>
+      </div>
+    </div>
+  </section>
 
-                <!-- HUD (Hidden initially) -->
-                <div class="ui-layer hud" id="hud" style="display:none;">
-                    <div class="stats-left">
-                        <div class="stat-box" id="timerDisplay">Epoch: 00:00</div>
-                        <div class="stat-box" id="levelDisplay">v1.0</div>
-                    </div>
-                    <div class="bars-right">
-                        <div>Integrity</div>
-                        <div class="bar-container"><div id="hpBar" class="bar-fill" style="width: 100%;"></div></div>
-                        <div>Data (XP)</div>
-                        <div class="bar-container"><div id="xpBar" class="bar-fill" style="width: 0%;"></div></div>
-                    </div>
-                </div>
+  <div class="divider"><hr /></div>
 
-                <!-- Start Screen -->
-                <div class="ui-layer" id="startScreen">
-                    <div class="menu">
-                        <h1>NEURAL SURVIVOR</h1>
-                        <p>Optimize the model. Eliminate noise.<br>Prevent Overfitting.</p>
-                        <button id="startBtn">INITIALIZE</button>
-                    </div>
-                </div>
+  <!-- CTA -->
+  <section class="cta-section" id="contact">
+    <div class="section-label">Let's Talk</div>
+    <h2>Tell us what you're building.</h2>
+    <p>
+      We'll tell you honestly whether we can help. If we can, we'll be writing code within the week. If we can't, we'll point you in the right direction.
+    </p>
+    <a href="mailto:inbox@arkanislabs.com" class="cta-email">inbox@arkanislabs.com</a>
+  </section>
 
-                <!-- Upgrade Screen -->
-                <div class="ui-layer" id="upgradeScreen" style="display:none;">
-                    <div class="menu">
-                        <h1>HYPERPARAMETER TUNING</h1>
-                        <p>Select an upgrade to refine the run:</p>
-                        <div class="upgrade-container" id="upgradeList"></div>
-                    </div>
-                </div>
-
-                <!-- Game Over Screen -->
-                <div class="ui-layer" id="gameOverScreen" style="display:none;">
-                    <div class="menu">
-                        <h1 style="color:var(--game-danger)">MODEL DIVERGED</h1>
-                        <p id="finalStats">Training Failed.</p>
-                        <button onclick="location.reload()">REBOOT SYSTEM</button>
-                    </div>
-                </div>
-
-                <div id="joystick-zone"><div id="joystick-knob"></div></div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact">
-        <div class="contact-box">
-            <h2>Ready to Scale?</h2>
-            <p style="margin-bottom: 30px;">
-                The gap between research and reliable deployment is where most projects fail. Our expertise bridges that divide. 
-                We are ready to partner with your team to deliver intelligent systems built on a foundation of real-world success.
-            </p>
-            <a href="mailto:inbox@arkanislabs.com" class="btn">Schedule a Consultation</a>
-        </div>
-    </section>
-
-    <footer>
-        <p>&copy; 2025 Arkanis Labs Inc.</p>
-    </footer>
-
-    <!-- 🎮 Game Script -->
-    <script>
-        // --- CORE SETUP ---
-        const CANVAS = document.getElementById('gameCanvas');
-        const CTX = CANVAS.getContext('2d');
-        const GAME_FRAME = document.getElementById('gameFrame');
-        
-        // --- CONFIG ---
-        const COLORS = {
-            player: '#00F0FF', // aligned with site accent
-            enemyBasic: '#ff5555',
-            enemyFast: '#ffaa00',
-            enemyTank: '#aa00ff',
-            gem: '#00aaff',
-            projectile: '#ffff00',
-            text: '#ffffff',
-            grid: 'rgba(0, 240, 255, 0.08)'
-        };
-
-        const MathUtils = {
-            rand: (min, max) => Math.random() * (max - min) + min,
-            dist: (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1),
-            clamp: (val, min, max) => Math.min(Math.max(val, min), max)
-        };
-
-        // --- GAME STATE ---
-        let game = {
-            active: false,
-            paused: false,
-            lastTime: 0,
-            time: 0,
-            width: 0,
-            height: 0,
-            
-            // Entities
-            player: null,
-            enemies: [],
-            gems: [],
-            projectiles: [],
-            texts: [],
-            
-            // Stats
-            score: 0,
-            level: 1,
-            xp: 0,
-            xpReq: 100,
-
-            // Systems
-            spawner: null,
-            input: null,
-            upgrades: null
-        };
-
-        // --- CLASSES ---
-
-        class Player {
-            constructor(x, y) {
-                this.x = x; this.y = y;
-                this.r = 15;
-                this.speed = 220;
-                this.maxHp = 100;
-                this.hp = 100;
-                this.mag = 120; // magnet range
-                this.angle = 0;
-                this.weapons = [new TensorBolt(this)];
-            }
-            update(dt) {
-                let dx = 0, dy = 0;
-                if(game.input.keys['w'] || game.input.keys['ArrowUp']) dy = -1;
-                if(game.input.keys['s'] || game.input.keys['ArrowDown']) dy = 1;
-                if(game.input.keys['a'] || game.input.keys['ArrowLeft']) dx = -1;
-                if(game.input.keys['d'] || game.input.keys['ArrowRight']) dx = 1;
-
-                if(game.input.joy.active) {
-                    dx = game.input.joy.x;
-                    dy = game.input.joy.y;
-                }
-
-                if(dx!==0 || dy!==0) {
-                    const l = Math.hypot(dx, dy);
-                    this.x += (dx/l) * this.speed * dt;
-                    this.y += (dy/l) * this.speed * dt;
-                }
-
-                this.x = MathUtils.clamp(this.x, this.r, game.width - this.r);
-                this.y = MathUtils.clamp(this.y, this.r, game.height - this.r);
-                this.angle += 3 * dt;
-
-                this.weapons.forEach(w => w.update(dt));
-            }
-            draw() {
-                CTX.translate(this.x, this.y);
-                CTX.rotate(this.angle);
-                CTX.beginPath();
-                CTX.arc(0,0,this.r,0,Math.PI*2);
-                CTX.fillStyle = 'rgba(0,0,0,0.8)';
-                CTX.fill();
-                CTX.lineWidth = 2;
-                CTX.strokeStyle = COLORS.player;
-                CTX.stroke();
-                // Nodes
-                for(let i=0; i<3; i++) {
-                    CTX.rotate(Math.PI*2/3);
-                    CTX.beginPath(); CTX.moveTo(10,0); CTX.lineTo(22,0); CTX.stroke();
-                    CTX.beginPath(); CTX.arc(22,0,4,0,Math.PI*2); CTX.fillStyle = COLORS.player; CTX.fill();
-                }
-                CTX.rotate(-this.angle);
-                CTX.translate(-this.x, -this.y);
-
-                // Magnet ring
-                CTX.beginPath();
-                CTX.arc(this.x, this.y, this.mag, 0, Math.PI*2);
-                CTX.strokeStyle = 'rgba(0,240,255,0.10)';
-                CTX.stroke();
-            }
-        }
-
-        class Enemy {
-            constructor(type, x, y) {
-                this.x = x; this.y = y; this.type = type;
-                this.speed = 100; this.hp = 10; this.dmg = 5; this.r = 12; 
-                this.col = COLORS.enemyBasic; this.xp = 5;
-                
-                if(type === 'bias') { // Tank
-                    this.speed = 60; this.hp = 45; this.r = 18; this.col = COLORS.enemyTank; this.xp = 15;
-                } else if(type === 'outlier') { // Fast
-                    this.speed = 170; this.hp = 5; this.r = 9; this.col = COLORS.enemyFast; this.xp = 8;
-                }
-            }
-            update(dt) {
-                const ang = Math.atan2(game.player.y - this.y, game.player.x - this.x);
-                this.x += Math.cos(ang) * this.speed * dt;
-                this.y += Math.sin(ang) * this.speed * dt;
-            }
-            draw() {
-                CTX.fillStyle = this.col;
-                CTX.translate(this.x, this.y);
-                if(this.type === 'bias') {
-                    CTX.fillRect(-this.r, -this.r, this.r*2, this.r*2);
-                } else if(this.type === 'outlier') {
-                    CTX.beginPath(); CTX.moveTo(0, -this.r); CTX.lineTo(this.r, this.r); CTX.lineTo(-this.r, this.r); CTX.fill();
-                } else {
-                    CTX.beginPath(); CTX.arc(0,0,this.r,0,Math.PI*2); CTX.fill();
-                }
-                CTX.translate(-this.x, -this.y);
-            }
-        }
-
-        class Projectile {
-            constructor(x, y, ang, spd, dmg) {
-                this.x = x; this.y = y;
-                this.vx = Math.cos(ang)*spd; this.vy = Math.sin(ang)*spd;
-                this.dmg = dmg; this.r = 4; this.life = 2; this.pierce = 1;
-            }
-            update(dt) {
-                this.x += this.vx * dt; this.y += this.vy * dt;
-                this.life -= dt;
-                if(this.x < 0 || this.x > game.width || this.y < 0 || this.y > game.height) this.life = 0;
-            }
-            draw() {
-                CTX.beginPath(); CTX.arc(this.x, this.y, this.r, 0, Math.PI*2);
-                CTX.fillStyle = COLORS.projectile; CTX.fill();
-            }
-        }
-
-        class Gem {
-            constructor(x, y, val) {
-                this.x = x; this.y = y; this.val = val; this.r = 4;
-            }
-            draw() {
-                CTX.fillStyle = COLORS.gem;
-                CTX.fillRect(this.x-3, this.y-3, 6, 6);
-            }
-        }
-
-        class TensorBolt {
-            constructor(p) { this.p = p; this.cd = 0; this.maxCd = 0.8; this.dmg = 12; this.name = "Tensor Bolt"; }
-            update(dt) {
-                this.cd -= dt;
-                if(this.cd <= 0) {
-                    let target = null, minD = 9999;
-                    game.enemies.forEach(e => {
-                        const d = MathUtils.dist(this.p.x, this.p.y, e.x, e.y);
-                        if(d < minD) { minD = d; target = e; }
-                    });
-                    if(target && minD < 600) {
-                        const ang = Math.atan2(target.y - this.p.y, target.x - this.p.x);
-                        game.projectiles.push(new Projectile(this.p.x, this.p.y, ang, 400, this.dmg));
-                        this.cd = this.maxCd;
-                    }
-                }
-            }
-            upgrade() { this.dmg += 8; this.maxCd *= 0.85; }
-        }
-
-        class Firewall {
-            constructor(p) { this.p = p; this.r = 70; this.dmg = 0.8; this.name = "Firewall"; }
-            update(dt) {
-                game.enemies.forEach(e => {
-                    if(MathUtils.dist(this.p.x, this.p.y, e.x, e.y) < this.r) e.hp -= this.dmg;
-                });
-                CTX.beginPath(); CTX.arc(this.p.x, this.p.y, this.r, 0, Math.PI*2);
-                CTX.strokeStyle = 'rgba(255, 85, 0, 0.3)'; CTX.lineWidth = 2; CTX.stroke();
-            }
-            upgrade() { this.r += 15; this.dmg += 0.4; }
-        }
-
-        // --- SYSTEMS ---
-
-        function Spawner(dt) {
-            if(!game.active) return;
-            this.timer = (this.timer || 0) - dt;
-            if(this.timer <= 0) {
-                const diff = 1 + (game.time / 60);
-                const rate = Math.max(0.2, 1.2 - (game.time/180));
-                
-                // Edge spawn
-                let ex, ey;
-                if(Math.random() < 0.5) {
-                    ex = Math.random() < 0.5 ? -20 : game.width + 20;
-                    ey = Math.random() * game.height;
-                } else {
-                    ex = Math.random() * game.width;
-                    ey = Math.random() < 0.5 ? -20 : game.height + 20;
-                }
-
-                let type = 'noise';
-                if(game.time > 45 && Math.random() > 0.8) type = 'bias';
-                if(game.time > 20 && Math.random() > 0.7 && Math.random() < 0.9) type = 'outlier';
-                
-                const e = new Enemy(type, ex, ey);
-                e.hp *= diff;
-                game.enemies.push(e);
-                this.timer = rate;
-            }
-        }
-
-        function handleInput() {
-            this.keys = {}; this.joy = { active:false, x:0, y:0 };
-            window.onkeydown = e => this.keys[e.key] = true;
-            window.onkeyup = e => this.keys[e.key] = false;
-
-            const z = document.getElementById('joystick-zone');
-            const k = document.getElementById('joystick-knob');
-
-            const touchHandler = (e) => {
-                e.preventDefault();
-                const t = e.touches[0];
-                const rect = z.getBoundingClientRect();
-                const cx = rect.left + rect.width/2;
-                const cy = rect.top + rect.height/2;
-                
-                const dx = t.clientX - cx;
-                const dy = t.clientY - cy;
-                const dist = Math.hypot(dx, dy);
-                const maxR = rect.width/2;
-                
-                let nx = dx, ny = dy;
-                if(dist > maxR) { nx = (dx/dist)*maxR; ny = (dy/dist)*maxR; }
-                
-                k.style.transform = `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
-                this.joy.active = true;
-                this.joy.x = nx/maxR; this.joy.y = ny/maxR;
-            };
-
-            if (z) {
-                z.ontouchstart = e => touchHandler(e);
-                z.ontouchmove = e => touchHandler(e);
-                z.ontouchend = () => {
-                    this.joy.active = false;
-                    k.style.transform = `translate(-50%, -50%)`;
-                };
-            }
-            return this;
-        }
-
-        function Upgrades() {
-            this.pool = [
-                { id: 'u1', name: 'Gradient Boost', desc: 'Tensor Bolt damage and cooldown improved.', fn: () => game.player.weapons[0].upgrade() },
-                { id: 'u2', name: 'Momentum', desc: '+20% movement speed.', fn: () => game.player.speed *= 1.2 },
-                { id: 'u3', name: 'Data Scraper', desc: '+50% pickup (magnet) range.', fn: () => game.player.mag *= 1.5 },
-                { id: 'u4', name: 'System Restore', desc: 'Restore 30% Integrity.', fn: () => game.player.hp = Math.min(game.player.maxHp, game.player.hp+30) },
-                { id: 'u5', name: 'Install Firewall', desc: 'New weapon: close-range Firewall aura.', oneTime:true, fn: () => {
-                    game.player.weapons.push(new Firewall(game.player));
-                    this.pool.push({id:'u6', name:'Patch Firewall', desc:'Upgrade Firewall damage and radius.', fn:()=>game.player.weapons.find(w=>w instanceof Firewall).upgrade()});
-                }}
-            ];
-
-            this.show = () => {
-                game.paused = true;
-                const div = document.getElementById('upgradeList');
-                div.innerHTML = '';
-                document.getElementById('upgradeScreen').style.display = 'flex';
-                
-                const opts = this.pool.filter(u => !u.removed).sort(() => 0.5 - Math.random()).slice(0, 3);
-                
-                opts.forEach(u => {
-                    const el = document.createElement('div');
-                    el.className = 'upgrade-card';
-                    el.innerHTML = `<div class="upgrade-title">${u.name}</div><div class="upgrade-desc">${u.desc}</div>`;
-                    el.onclick = () => {
-                        u.fn();
-                        if(u.oneTime) u.removed = true;
-                        document.getElementById('upgradeScreen').style.display = 'none';
-                        game.paused = false;
-                    };
-                    div.appendChild(el);
-                });
-            };
-            return this;
-        }
-
-        // --- MAIN LOOP ---
-
-        function resize() {
-            const rect = GAME_FRAME.getBoundingClientRect();
-            game.width = rect.width;
-            game.height = rect.height;
-            CANVAS.width = game.width;
-            CANVAS.height = game.height;
-        }
-        window.addEventListener('resize', resize);
-
-        function init() {
-            resize();
-            game.input = handleInput.call({});
-            game.upgrades = Upgrades.call({});
-            
-            game.player = new Player(game.width/2, game.height/2);
-            requestAnimationFrame(loop);
-            
-            if('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-                const joy = document.getElementById('joystick-zone');
-                if (joy) joy.style.display = 'block';
-            }
-        }
-
-        function startGame() {
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('hud').style.display = 'flex';
-            game.active = true;
-            game.time = 0;
-            game.score = 0;
-            game.xp = 0;
-            game.level = 1;
-            game.xpReq = 100;
-            game.enemies = [];
-            game.projectiles = [];
-            game.gems = [];
-            game.player = new Player(game.width/2, game.height/2);
-            updateHud();
-        }
-
-        document.getElementById('startBtn').onclick = startGame;
-
-        function updateHud() {
-            const m = Math.floor(game.time/60).toString().padStart(2,'0');
-            const s = Math.floor(game.time%60).toString().padStart(2,'0');
-            document.getElementById('timerDisplay').innerText = `Epoch: ${m}:${s}`;
-            document.getElementById('levelDisplay').innerText = `v${game.level}.0`;
-            document.getElementById('xpBar').style.width = (game.xp/game.xpReq*100) + '%';
-            document.getElementById('hpBar').style.width = (game.player.hp/game.player.maxHp*100) + '%';
-        }
-
-        function loop(now) {
-            const dt = Math.min((now - game.lastTime) / 1000, 0.1);
-            game.lastTime = now;
-
-            if(!game.paused) {
-                CTX.clearRect(0,0,game.width, game.height);
-                
-                // Background grid
-                CTX.strokeStyle = COLORS.grid;
-                CTX.lineWidth = 1;
-                const ox = -(game.player ? game.player.x : 0) % 50;
-                const oy = -(game.player ? game.player.y : 0) % 50;
-                for(let x=ox; x<game.width; x+=50) {
-                    CTX.beginPath(); CTX.moveTo(x,0); CTX.lineTo(x,game.height); CTX.stroke();
-                }
-                for(let y=oy; y<game.height; y+=50) {
-                    CTX.beginPath(); CTX.moveTo(0,y); CTX.lineTo(game.width,y); CTX.stroke();
-                }
-
-                if(game.active) {
-                    game.time += dt;
-                    game.player.update(dt);
-                    Spawner.call(game, dt);
-
-                    // Enemy logic
-                    game.enemies.forEach((e, i) => {
-                        e.update(dt);
-                        if(MathUtils.dist(e.x,e.y,game.player.x,game.player.y) < e.r+game.player.r) {
-                            game.player.hp -= e.dmg;
-                            updateHud();
-                            if(game.player.hp <= 0) {
-                                game.active = false;
-                                document.getElementById('gameOverScreen').style.display = 'flex';
-                                document.getElementById('finalStats').innerText = `Data Processed: ${game.score}`;
-                            }
-                        }
-                    });
-                    
-                    // Projectiles
-                    game.projectiles.forEach((p, i) => {
-                        p.update(dt);
-                        if(p.life <= 0) {
-                            game.projectiles.splice(i,1);
-                        } else {
-                            game.enemies.forEach((e, ei) => {
-                                if(MathUtils.dist(p.x,p.y,e.x,e.y) < p.r+e.r) {
-                                    e.hp -= p.dmg;
-                                    p.life = 0;
-                                    if(e.hp <= 0) {
-                                        game.enemies.splice(ei, 1);
-                                        game.gems.push(new Gem(e.x, e.y, e.xp));
-                                        game.score++;
-                                        updateHud();
-                                    }
-                                }
-                            });
-                        }
-                    });
-
-                    // Gems
-                    game.gems.forEach((g,i) => {
-                        const d = MathUtils.dist(g.x,g.y,game.player.x,game.player.y);
-                        if(d < game.player.mag) {
-                            g.x += (game.player.x - g.x) * 5 * dt;
-                            g.y += (game.player.y - g.y) * 5 * dt;
-                        }
-                        if(d < game.player.r) {
-                            game.xp += g.val;
-                            game.gems.splice(i,1);
-                            if(game.xp >= game.xpReq) {
-                                game.xp -= game.xpReq;
-                                game.level++;
-                                game.xpReq = Math.floor(game.xpReq * 1.4);
-                                game.upgrades.show();
-                            }
-                            updateHud();
-                        }
-                        g.draw();
-                    });
-                }
-                
-                game.enemies.forEach(e => e.draw());
-                game.projectiles.forEach(p => p.draw());
-                if(game.player) {
-                    // Firewall draws inside its own update
-                    game.player.weapons.forEach(w => {
-                        if(w instanceof Firewall) {
-                            w.update(0); // visual-only call to keep aura visible
-                        }
-                    });
-                    game.player.draw();
-                }
-            }
-
-            requestAnimationFrame(loop);
-        }
-
-        window.onload = init;
-    </script>
+  <footer>
+    <p>&copy; 2026 Arkanis Labs Inc.</p>
+  </footer>
 
 </body>
 </html>

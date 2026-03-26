@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Amnesia Problem: Architecting Long-Term Memory | Arkanis Labs Blog</title>
+  <meta name="description" content="Why AI agents need persistent memory, the dangers of memory poisoning, and why you should start with Postgres, not GraphRAG." />
+  <meta name="keywords" content="AI memory, Zep, Mem0, GraphRAG, vector database, agentic AI, Arkanis Labs" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The Amnesia Problem: Architecting Long-Term Memory" />
+  <meta property="og:description" content="Why AI agents need persistent memory, the dangers of memory poisoning, and why you should start with Postgres." />
+  <meta property="og:url" content="https://www.arkanislabs.com/blog/2026-01-25-amnesia.html" />
+  <meta property="og:site_name" content="Arkanis Labs" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Amnesia Problem: Architecting Long-Term Memory" />
+  <meta name="twitter:description" content="Why AI agents need persistent memory, the dangers of memory poisoning, and why you should start with Postgres." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --bg-elevated: #111113;
+      --bg-card: #161619;
+      --border: #23232a;
+      --border-hover: #36363f;
+      --text-primary: #e8e8ed;
+      --text-secondary: #8a8a9a;
+      --text-muted: #55555f;
+      --accent: #c8f031;
+      --accent-dim: #a0c020;
+      --accent-glow: rgba(200, 240, 49, 0.08);
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Instrument Sans', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--sans);
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 11, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a.active { color: var(--accent); }
+
+    /* LAYOUT */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 8rem 2rem 6rem;
+    }
+
+    /* BACK NAV */
+    .back-nav { margin-bottom: 3rem; }
+
+    .back-nav a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+
+    .back-nav a:hover { color: var(--accent); }
+
+    /* POST HEADER */
+    .post-header { margin-bottom: 3.5rem; }
+
+    .post-meta {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+
+    .post-header h1 {
+      font-family: var(--sans);
+      font-size: clamp(1.85rem, 4vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .post-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid rgba(200, 240, 49, 0.15);
+      padding: 0.25rem 0.65rem;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    /* CONTENT */
+    .post-content h2 {
+      font-family: var(--sans);
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin: 3rem 0 1rem;
+      padding-left: 1rem;
+      border-left: 3px solid var(--accent);
+    }
+
+    .post-content h3 {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 2rem 0 0.75rem;
+      letter-spacing: 0.02em;
+    }
+
+    .post-content p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.85;
+      margin-bottom: 1.5rem;
+    }
+
+    .post-content strong { color: var(--text-primary); font-weight: 600; }
+
+    .post-content blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      margin: 2.5rem 0;
+      background: var(--accent-glow);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .post-content blockquote p {
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      font-style: italic;
+      margin-bottom: 0;
+    }
+
+    .post-content ul {
+      list-style: none;
+      margin-bottom: 1.5rem;
+      padding: 0;
+    }
+
+    .post-content ul li {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      padding-left: 1.5rem;
+      position: relative;
+      margin-bottom: 0.75rem;
+    }
+
+    .post-content ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-family: var(--mono);
+    }
+
+    /* ALERT BOX */
+    .alert-box {
+      background: rgba(255, 84, 176, 0.04);
+      border: 1px solid rgba(255, 84, 176, 0.35);
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin: 2rem 0;
+    }
+
+    .alert-title {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #FF54B0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.75rem;
+    }
+
+    .alert-box p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      margin-bottom: 0;
+    }
+
+    /* VISUALIZER */
+    .visualizer-container {
+      background: #08080C;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 2rem 0;
+      height: 500px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-panel {
+      background: rgba(10, 10, 11, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+    }
+
+    .visualizer-label {
+      position: absolute;
+      top: 1.25rem;
+      left: 1.25rem;
+      z-index: 10;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      max-width: 240px;
+    }
+
+    .visualizer-label h3 {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    .visualizer-label p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    /* DEMO CTA */
+    .demo-cta {
+      margin-top: 4rem;
+      padding: 3rem 2.5rem;
+      border-radius: 8px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(200, 240, 49, 0.2);
+      text-align: center;
+    }
+
+    .demo-cta h3 {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .demo-cta p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 480px;
+      margin: 0 auto 2rem;
+      line-height: 1.75;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.85rem 1.75rem;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .cta-btn:hover { background: var(--accent-dim); transform: translateY(-1px); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4rem;
+    }
+
+    @media (max-width: 680px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { gap: 1.25rem; }
+      .container { padding: 7rem 1.25rem 4rem; }
+      .visualizer-container { height: 380px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="logo">Arkanis<span>Labs</span></a>
+    <ul class="nav-links">
+      <li><a href="/#capabilities">Capabilities</a></li>
+      <li><a href="/#process">Process</a></li>
+      <li><a href="/#team">Team</a></li>
+      <li><a href="/blog/" class="active">Blog</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <div class="back-nav">
+      <a href="/blog/">← Back to Blog</a>
+    </div>
+
+    <article>
+      <div class="post-header">
+        <div class="post-meta">JANUARY 25, 2026 &nbsp;·&nbsp; ARKANIS LABS &nbsp;·&nbsp; 8 MIN READ</div>
+        <h1>The Amnesia Problem: Architecting Long-Term Memory</h1>
+        <div class="post-tags">
+          <span class="tag">Agentic AI</span>
+          <span class="tag">Systems Design</span>
+          <span class="tag">Postgres</span>
+        </div>
+      </div>
+
+      <div class="post-content">
+        <p>Imagine hiring a brilliant employee who forgets everything you said yesterday. Every morning, you have to re-explain the project goals, their role, and the nuances of your business. This is the reality of most LLM agents today.</p>
+
+        <p>To move beyond simple "chatbots" to agents that can self-improve, we need to solve the <strong>Long-Term Memory</strong> problem. We need systems that reduce the cognitive load of prompt management and allow agents to retain context across weeks, not just windows.</p>
+
+        <h2>The Architecture of Memory</h2>
+
+        <p>Memory isn't just about storage; it's about the lifecycle of a fact. From ingestion to retrieval, and eventually to "forgetting" or compression. Below is the generalized pattern we use at Arkanis to build persistent agents.</p>
+
+        <!-- MEMORY CYCLE VISUALIZER -->
+        <div class="visualizer-container">
+          <div class="visualizer-label glass-panel">
+            <h3>Memory Pattern</h3>
+            <p>Simulation of facts flowing from Short-term Context to Long-term Store.</p>
+          </div>
+
+          <svg id="memory-svg" style="width:100%;height:100%;">
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#c8f031" />
+              </marker>
+            </defs>
+            <path id="flow-path-user"  d="" fill="none" stroke="#c8f031" stroke-width="1" stroke-opacity="0.2" />
+            <path id="flow-path-write" d="" fill="none" stroke="#c8f031" stroke-width="1" stroke-opacity="0.2" stroke-dasharray="5,5" />
+            <path id="flow-path-read"  d="" fill="none" stroke="#7F5AF0" stroke-width="1" stroke-opacity="0.4" />
+            <g id="nodes-layer"></g>
+            <g id="particles-layer"></g>
+          </svg>
+        </div>
+
+        <h2>It Is Not Bulletproof</h2>
+
+        <p>While the diagram looks clean, the reality of implementing long-term memory at scale introduces dangerous failure modes that can silently degrade your agent's performance.</p>
+
+        <h3>1. The Conflicting Fact Problem</h3>
+        <p>Consider a medical chronology: A patient reports "acute lower back pain" in January. By June, they report "pain has subsided, now focusing on mobility." If the memory system naively retrieves the January record without weighting for recency or contradiction, the agent might suggest treatment for acute pain that is no longer relevant—potentially confusing the recovery phase.</p>
+
+        <h3>2. Memory Poisoning</h3>
+        <p>If an LLM hallucinates a fact and commits it to long-term memory, that hallucination becomes a "truth" for all future interactions. This self-reinforcing loop can poison a model's behavior permanently.</p>
+
+        <h3>3. The Unbounded Growth & The GraphRAG Tax</h3>
+        <p>In an increasingly crowded space, memory stores grow indefinitely. Techniques like <strong>GraphRAG</strong> offer global reasoning capabilities but are incredibly expensive to scale. We have developed cheaper, compression-based options that discard the need for a heavy knowledge graph while maintaining retrieval accuracy.</p>
+
+        <h2>The Benchmark Mirage</h2>
+
+        <p>So, how do you choose a stack? If you look at the industry, you'll find a history of squabbling between providers like Zep, Mem0, and others. Benchmark results are inconsistent, often cherry-picked to favor the author's architecture.</p>
+
+        <div class="alert-box">
+          <span class="alert-title">Warning: Domain Specificity</span>
+          <p>Generic benchmarks rarely reflect production reality. A memory system optimized for chat logs might fail catastrophically on <strong>medical chronologies</strong> or <strong>Text-to-SQL</strong> workflows where exact schema retention is non-negotiable.</p>
+        </div>
+
+        <h2>Call to Action: Start Boring</h2>
+
+        <p>Do not start with a complex Graph Database. Keep your technical debt low. Tailor a simple open-source solution using <strong>Postgres with pgvector</strong>.</p>
+
+        <p>Layer on complexity only when you have proven that simple semantic search is insufficient. The most robust systems we build at Arkanis often rely on boring, reliable SQL backends with a thin, intelligent orchestration layer on top.</p>
+
+        <h2>Engineering for Observability</h2>
+
+        <p>Memory is a product and engineering problem, not just an AI research problem. Assuming your agent is deployed, do you have the observability tools to answer these questions?</p>
+
+        <ul>
+          <li>Can the system differentiate between <strong>noise</strong> (casual chit-chat) and <strong>facts</strong> (user constraints) that ought to be committed?</li>
+          <li>Can the system resolve shifting user preferences over time?</li>
+          <li>Can you "patch" a poisoned memory without wiping the entire user history?</li>
+        </ul>
+
+        <p>If you cannot answer "yes" to these, you are building a black box that will eventually fail.</p>
+      </div>
+
+      <div class="demo-cta" id="demo">
+        <h3>Hire Professionals</h3>
+        <p>Building persistent agentic memory is difficult. We help teams skip the R&D trap and deploy memory systems that actually work.</p>
+        <a href="mailto:inbox@arkanislabs.com" class="cta-btn">Contact Arkanis Labs</a>
+      </div>
+    </article>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Arkanis Labs Inc.</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.querySelector('.visualizer-container');
+      const nodesLayer = document.getElementById('nodes-layer');
+      const particlesLayer = document.getElementById('particles-layer');
+      const flowPathUser  = document.getElementById('flow-path-user');
+      const flowPathWrite = document.getElementById('flow-path-write');
+      const flowPathRead  = document.getElementById('flow-path-read');
+
+      let w, h, boxW, boxH, halfW, halfH, cpY_Offset;
+
+      const nodes = [
+        { id: 'user',  label: 'USER INPUT',   x: 0.15, y: 0.5, color: '#e8e8ed' },
+        { id: 'agent', label: 'AI AGENT',     x: 0.45, y: 0.5, color: '#c8f031' },
+        { id: 'store', label: 'MEMORY STORE', x: 0.85, y: 0.5, color: '#7F5AF0' }
+      ];
+
+      function updateDimensions() {
+        w = container.offsetWidth;
+        h = container.clientHeight;
+        const isMobile = w < 768;
+        if (isMobile) {
+          boxW = Math.min(80, w * 0.22);
+          boxH = 40;
+          cpY_Offset = 50;
+        } else {
+          boxW = 120;
+          boxH = 60;
+          cpY_Offset = 80;
+        }
+        halfW = boxW / 2;
+        halfH = boxH / 2;
+      }
+
+      function drawSystem() {
+        updateDimensions();
+        while (nodesLayer.firstChild) nodesLayer.removeChild(nodesLayer.firstChild);
+
+        nodes.forEach(node => {
+          const cx = node.x * w;
+          const cy = node.y * h;
+
+          const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+          rect.setAttribute("x", cx - halfW);
+          rect.setAttribute("y", cy - halfH);
+          rect.setAttribute("width", boxW);
+          rect.setAttribute("height", boxH);
+          rect.setAttribute("rx", "6");
+          rect.setAttribute("fill", "rgba(10, 10, 11, 0.85)");
+          rect.setAttribute("stroke", node.color);
+          rect.setAttribute("stroke-width", "1.5");
+          nodesLayer.appendChild(rect);
+
+          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          text.setAttribute("x", cx);
+          text.setAttribute("y", cy + (boxH < 50 ? 4 : 5));
+          text.setAttribute("text-anchor", "middle");
+          text.setAttribute("fill", node.color);
+          text.setAttribute("font-family", "'JetBrains Mono', monospace");
+          text.setAttribute("font-weight", "600");
+          text.setAttribute("font-size", boxW < 90 ? "8px" : "10px");
+          text.textContent = node.label;
+          nodesLayer.appendChild(text);
+        });
+
+        const cy = 0.5 * h;
+        const userX    = nodes[0].x * w + halfW;
+        const agentInX = nodes[1].x * w - halfW;
+        const agentOutX= nodes[1].x * w + halfW;
+        const storeInX = nodes[2].x * w - halfW;
+        const cpX      = (nodes[1].x * w + nodes[2].x * w) / 2;
+
+        flowPathUser.setAttribute("d",  `M ${userX} ${cy} L ${agentInX} ${cy}`);
+        flowPathWrite.setAttribute("d", `M ${agentOutX} ${cy - halfH/3} Q ${cpX} ${cy - cpY_Offset} ${storeInX} ${cy - halfH/3}`);
+        flowPathRead.setAttribute("d",  `M ${storeInX} ${cy + halfH/3} Q ${cpX} ${cy + cpY_Offset} ${agentOutX} ${cy + halfH/3}`);
+      }
+
+      function spawnParticle() {
+        const particle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        particle.setAttribute("r", "3");
+        particle.setAttribute("fill", "#e8e8ed");
+        particlesLayer.appendChild(particle);
+
+        let progress = 0;
+        const speed = 0.008 + Math.random() * 0.004;
+
+        const cy       = 0.5 * h;
+        const userX    = nodes[0].x * w + halfW;
+        const agentInX = nodes[1].x * w - halfW;
+        const agentOutX= nodes[1].x * w + halfW;
+        const storeInX = nodes[2].x * w - halfW;
+        const cpX      = (nodes[1].x * w + nodes[2].x * w) / 2;
+        const yOffset  = halfH / 3;
+
+        const animate = () => {
+          progress += speed;
+          if (progress > 2.5) {
+            if (particlesLayer.contains(particle)) particlesLayer.removeChild(particle);
+            return;
+          }
+
+          let x, y;
+
+          if (progress < 1.0) {
+            x = userX + (agentInX - userX) * progress;
+            y = cy;
+          } else if (progress < 1.75) {
+            const t = (progress - 1.0) / 0.75;
+            const P0 = { x: agentOutX, y: cy - yOffset };
+            const P1 = { x: cpX,       y: cy - cpY_Offset };
+            const P2 = { x: storeInX,  y: cy - yOffset };
+            x = Math.pow(1-t,2)*P0.x + 2*(1-t)*t*P1.x + Math.pow(t,2)*P2.x;
+            y = Math.pow(1-t,2)*P0.y + 2*(1-t)*t*P1.y + Math.pow(t,2)*P2.y;
+            particle.setAttribute("fill", "#c8f031");
+          } else {
+            const t = (progress - 1.75) / 0.75;
+            const P0 = { x: storeInX,  y: cy + yOffset };
+            const P1 = { x: cpX,       y: cy + cpY_Offset };
+            const P2 = { x: agentOutX, y: cy + yOffset };
+            x = Math.pow(1-t,2)*P0.x + 2*(1-t)*t*P1.x + Math.pow(t,2)*P2.x;
+            y = Math.pow(1-t,2)*P0.y + 2*(1-t)*t*P1.y + Math.pow(t,2)*P2.y;
+            particle.setAttribute("fill", "#7F5AF0");
+          }
+
+          particle.setAttribute("cx", x);
+          particle.setAttribute("cy", y);
+          requestAnimationFrame(animate);
+        };
+
+        requestAnimationFrame(animate);
+      }
+
+      drawSystem();
+      window.addEventListener('resize', drawSystem);
+      setInterval(spawnParticle, 1200);
+    });
+  </script>
+</body>
+</html>
