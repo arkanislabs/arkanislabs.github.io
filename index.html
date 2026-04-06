@@ -359,6 +359,64 @@
       margin-bottom: 0;
     }
 
+    /* TEAM CARDS */
+    .team-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .team-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-card);
+      overflow: hidden;
+      transition: border-color 0.25s;
+    }
+
+    .team-card:hover { border-color: var(--border-hover); }
+
+    .team-card img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(30%);
+      transition: filter 0.3s;
+    }
+
+    .team-card:hover img { filter: grayscale(0%); }
+
+    .team-card-info {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .team-card-info h4 {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.2rem;
+    }
+
+    .team-card-info .role {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .team-card-info p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
     /* CLIENTS */
     .client-context {
       display: grid;
@@ -506,6 +564,7 @@
       .cap-grid { grid-template-columns: 1fr; }
       .client-context { grid-template-columns: 1fr; }
       .team-traits { grid-template-columns: 1fr; }
+      .team-cards { grid-template-columns: 1fr; }
       .step { grid-template-columns: 2.5rem 1fr; gap: 1rem; }
       .step-num { width: 2.5rem; height: 2.5rem; font-size: 0.7rem; }
     }
@@ -649,6 +708,40 @@
       <div class="trait">
         <h4>Full Stack ML</h4>
         <p>From research notebooks to production pipelines, monitoring dashboards to rollback strategies. No hand-off gaps.</p>
+      </div>
+    </div>
+    <div class="team-cards">
+      <div class="team-card">
+        <img src="images/the_goat_400.png" alt="Deltcho Valtchanov" />
+        <div class="team-card-info">
+          <h4>Deltcho Valtchanov</h4>
+          <div class="role">Co-Founder</div>
+          <p>Deltcho has spent over a decade building the kinds of AI systems that most companies are now trying, and often failing, to build. He shipped one of the first customer-facing LLM products on the market years before ChatGPT, led billion-parameter model training and serving at Axonify, and built agentic legal AI at EvenUp that could reason over tens of millions of words with full audit trails. That depth, from low-level model internals to production retrieval systems, is what lets him cut through the noise in a due diligence review. He knows what real AI IP looks like because he's built it, and he can spot a failing project early because he's been the one called in to fix them. At Arkanis, he leads technical due diligence for VC-backed AI investments and runs project recovery for enterprises where delivery has gone sideways.</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <img src="images/j_whiting_400.jpg" alt="Julian Whiting" />
+        <div class="team-card-info">
+          <h4>Julian Whiting</h4>
+          <div class="role">Co-Founder</div>
+          <p>Julian spent the better part of a decade as a hands-on ML engineer and technical leader, building systems at the intersection of applied AI research and production infrastructure. He developed DRIFT Search for Microsoft's GraphRAG project — taking it from initial research through to open source implementation, one of the most widely adopted contributions in the RAG space. He built the document intelligence engine for DARPA's ASKEM program, where a lightweight document processing system consolidated work previously spread across multiple university research groups, returning millions in budget back to the program. He scaled self-hosted transformer inference endpoints to millions of daily requests at Bark, and alongside co-founder Deltcho, shipped some of the first GPT-2-based content generators to Fortune 500 companies in the pre-GPT API era. At Arkanis, he brings that same bias toward building production AI systems that actually work.</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <img src="images/a_citron_400.jpg" alt="Alberto Citron" />
+        <div class="team-card-info">
+          <h4>Alberto Citron</h4>
+          <div class="role">Principal Cloud & AI Infrastructure Engineer</div>
+          <p>Alberto has spent the better part of a decade building data and ML infrastructure across ad-tech, fintech, healthcare, and supply chain, from fraud detection models at Experian to rebuilding entire cloud pipelines (AWS → GCP) for biotech startups. He's worked extensively with GCP, BigQuery, Kubernetes, and distributed systems like Dask, with a consistent focus on making data platforms that actually scale under real workloads. At Arkanis Labs, he brings hands-on depth in cloud-native architecture and ML-ready data infrastructure.</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <img src="images/w_el_ahmar_400.jpg" alt="Wassim El Ahmar" />
+        <div class="team-card-info">
+          <h4>Wassim El Ahmar</h4>
+          <div class="role">Advisor — Edge AI & Embedded Vision Systems</div>
+          <p>Wassim is a professor of electrical and computer engineering at the University of Ottawa and a computer vision expert with deep roots in both academic research and production industry systems. He's one of the few people in Canada operating at both ends of the embedded vision problem simultaneously. As Staff ML Engineer at Inspiren, he architects hybrid edge-cloud perception systems using depth estimation, vision foundation models, and VLMs. He's built object tracking and re-identification systems for edge analytics, sensor fusion pipelines for autonomous vehicles (lidar, thermal, 3D cameras), and ported production vision models to next-gen NPU hardware, cutting unit costs by 90%. He holds a PhD in deep learning optimization for embedded systems. At Arkanis, Wassim advises on the problems most teams can't touch: real-time computer vision on constrained hardware, multi-sensor perception for autonomous systems, and AI-enabled situational awareness for defence and critical infrastructure.</p>
+        </div>
       </div>
     </div>
   </section>
