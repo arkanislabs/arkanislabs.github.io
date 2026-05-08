@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Best AI Engineers Are Engineers First | Arkanis Labs Blog</title>
+  <meta name="description" content="Four traits we hire for in AI engineers, in order, and why pedigree-only hiring fails six months in." />
+  <meta name="keywords" content="AI engineer hiring, AI engineering, hiring, frontier models, evals, prompt engineering, Arkanis Labs" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The Best AI Engineers Are Engineers First" />
+  <meta property="og:description" content="Four traits we hire for in AI engineers, in order, and why pedigree-only hiring fails six months in." />
+  <meta property="og:url" content="https://www.arkanislabs.com/blog/2026-05-08-engineers-first.html" />
+  <meta property="og:site_name" content="Arkanis Labs" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Best AI Engineers Are Engineers First" />
+  <meta name="twitter:description" content="Four traits we hire for in AI engineers, in order, and why pedigree-only hiring fails six months in." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --bg-elevated: #111113;
+      --bg-card: #161619;
+      --border: #23232a;
+      --border-hover: #36363f;
+      --text-primary: #e8e8ed;
+      --text-secondary: #8a8a9a;
+      --text-muted: #55555f;
+      --accent: #c8f031;
+      --accent-dim: #a0c020;
+      --accent-glow: rgba(200, 240, 49, 0.08);
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Instrument Sans', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--sans);
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 11, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a.active { color: var(--accent); }
+
+    /* HAMBURGER */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      z-index: 102;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 18px;
+      height: 1.5px;
+      background: var(--text-primary);
+      transition: transform 0.35s cubic-bezier(0.77,0.2,0.05,1), opacity 0.25s ease;
+    }
+    .nav-toggle span:nth-child(1) { margin-bottom: 5px; }
+    .nav-toggle span:nth-child(3) { margin-top: 5px; }
+    .nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(3.5px, 4.5px); }
+    .nav-toggle.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(3.5px, -4.5px); }
+
+    /* LAYOUT */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 8rem 2rem 6rem;
+    }
+
+    /* BACK NAV */
+    .back-nav { margin-bottom: 3rem; }
+
+    .back-nav a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+
+    .back-nav a:hover { color: var(--accent); }
+
+    /* POST HEADER */
+    .post-header { margin-bottom: 3.5rem; }
+
+    .post-meta {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+
+    .post-header h1 {
+      font-family: var(--sans);
+      font-size: clamp(1.85rem, 4vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .post-header .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .post-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid rgba(200, 240, 49, 0.15);
+      padding: 0.25rem 0.65rem;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    /* CONTENT */
+    .post-content h2 {
+      font-family: var(--sans);
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin: 3rem 0 1rem;
+      padding-left: 1rem;
+      border-left: 3px solid var(--accent);
+    }
+
+    .post-content h3 {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 2rem 0 0.75rem;
+      letter-spacing: 0.02em;
+    }
+
+    .post-content p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.85;
+      margin-bottom: 1.5rem;
+    }
+
+    .post-content strong { color: var(--text-primary); font-weight: 600; }
+
+    .post-content blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      margin: 2.5rem 0;
+      background: var(--accent-glow);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .post-content blockquote p {
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      font-style: italic;
+      margin-bottom: 0;
+    }
+
+    .post-content ul {
+      list-style: none;
+      margin-bottom: 1.5rem;
+      padding: 0;
+    }
+
+    .post-content ul li {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      padding-left: 1.5rem;
+      position: relative;
+      margin-bottom: 0.75rem;
+    }
+
+    .post-content ul li::before {
+      content: '\2192';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-family: var(--mono);
+    }
+
+    .post-content a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(200, 240, 49, 0.3);
+      transition: border-color 0.2s;
+    }
+
+    .post-content a:hover { border-color: var(--accent); }
+
+    /* DEMO CTA */
+    .demo-cta {
+      margin-top: 4rem;
+      padding: 3rem 2.5rem;
+      border-radius: 8px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(200, 240, 49, 0.2);
+      text-align: center;
+    }
+
+    .demo-cta h3 {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .demo-cta p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 480px;
+      margin: 0 auto 2rem;
+      line-height: 1.75;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.85rem 1.75rem;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .cta-btn:hover { background: var(--accent-dim); transform: translateY(-1px); }
+
+    /* DIVIDER */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 3rem 0;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    @media (max-width: 680px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      .nav-links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 0;
+        background: rgba(10, 10, 11, 0.96);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        z-index: 99;
+        padding: 5rem 1.5rem 2rem;
+        border-bottom: 1px solid var(--border);
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      }
+      .nav-links.open {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .nav-links li {
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+      }
+      .nav-links li:last-child { border-bottom: none; }
+      .nav-links a {
+        font-size: 0.85rem;
+        display: block;
+        padding: 1rem 0.25rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        transition: color 0.2s, padding-left 0.3s;
+      }
+      .nav-links.open a { color: var(--text-secondary); }
+      .nav-links a:hover,
+      .nav-links a:active { color: var(--accent); padding-left: 0.5rem; }
+      .nav-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 98;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .nav-backdrop.visible { display: block; opacity: 1; }
+      .container { padding: 7rem 1.25rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-backdrop"></div>
+  <nav>
+    <a href="/" class="logo">Arkanis<span>Labs</span></a>
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="/#capabilities">Capabilities</a></li>
+      <li><a href="/#process">Process</a></li>
+      <li><a href="/#team">Team</a></li>
+      <li><a href="/blog/" class="active">Blog</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <div class="back-nav">
+      <a href="/blog/">&larr; Back to Blog</a>
+    </div>
+
+    <article>
+      <div class="post-header">
+        <div class="post-meta">MAY 8, 2026 &nbsp;&middot;&nbsp; ARKANIS LABS &nbsp;&middot;&nbsp; 4 MIN READ</div>
+        <h1>The Best AI Engineers Are Engineers First</h1>
+        <p class="subtitle">Four traits, in order</p>
+        <div class="post-tags">
+          <span class="tag">AI Engineering</span>
+          <span class="tag">Hiring</span>
+          <span class="tag">Culture</span>
+        </div>
+      </div>
+
+      <div class="post-content">
+        <p>We've been hiring at Arkanis and helping clients build their founding engineering teams. Here's the pattern.</p>
+
+        <p>A quick scope note. This is about AI engineer roles at growth stage product companies building features on top of frontier models, shipping to real users. It's not about research scientists working on autonomous driving, robotics, or foundation models. Different work, different hire, different post.</p>
+
+        <p>Engineering hiring rigor evaporates the moment "AI" appears in the title. Companies that would never hire a backend engineer on pedigree alone do exactly that for AI roles, then wonder six months in why nothing ships past the demo.</p>
+
+        <h2>Four traits, in order</h2>
+
+        <p>The order below matters. Trait one is the foundation where the rest only emerge from someone who has it.</p>
+
+        <h3>1. Strong engineer first.</h3>
+
+        <p>Years operating production systems that handle real traffic. Owned bugfixes. Lived through incidents. Knows what production actually demands: observability, cost monitoring, graceful degradation, idempotency. The boring stuff that keeps software working when nobody is watching.</p>
+
+        <p>Folks with engineering maturity use AI tools effectively without outsourcing their thinking entirely to the LLM.</p>
+
+        <p><strong>Interview tell:</strong> Pair program on a problem where your candidate can use AI assistance and watch how they spec out the problem. If they don't know where to look for failure cases, it's a red flag.</p>
+
+        <h3>2. Knows where frontier models fail.</h3>
+
+        <p>The hire you want has read the same hype cycle posts you have and is unmoved by them. They know the gap between what the vendor marketing says and what the model does in production.</p>
+
+        <p><strong>Interview tell:</strong> ask them to name a frontier model limitation that contradicts the marketing.</p>
+
+        <h3>3. Keeps it simple, ships, monitors, acts.</h3>
+
+        <p>The pattern: reach for the smallest design that handles the known requirements and the failure modes you can reasonably predict. A single LLM call with a structured output schema. Retries. An eval on yesterday's traffic. A feature flag. A dashboard. Five things, none skippable, built day one because the senior engineer doesn't think of them as optional.</p>
+
+        <p>The trap is that "simple" gets used to justify the opposite. No retries because the happy path works. No offline eval because we'll add it later. No A/B testing on live traffic because shipping big changes faster feels like progress. Same words, very different systems.</p>
+
+        <h3>4. Treats measurement as the deliverable.</h3>
+
+        <p>The hire you want ships an experiment that produces a feature when it earns its place. They pick a business metric, design the smallest variant that could move it, run it, and come back in business terms. "Ticket deflection moved from 22% to 27%, here's what it costs in inference, here's the regression we caught in eval that still needs work."</p>
+
+        <p>That conversation is what makes AI investment manageable from the exec seat. Demo builders rarely have a number to show, which is why the conversation about their work always ends up being about vibes.</p>
+
+        <h2>The thread</h2>
+
+        <p>Read as a checklist this is obvious. Strong engineer, model literacy, ships simply, measures everything.</p>
+
+        <p>Almost nobody hires this way, and part of the reason is structural. Legacy job boards and matching tools run on search that heavily relies on keywords. Hype beasts get bubbled to the top because their resumes are stuffed with the right vocabulary. The matching tools are configured to surface that profile, and the top K candidates that land on your desk are filtered for it before you see them.</p>
+
+        <p>Plenty of diamonds in the rough sit a few pages deeper, the people who aren't asking $250&ndash;300K for a senior role where they'll mostly talk your ear off about AI hype. The talent is there.</p>
+      </div>
+
+      <div class="demo-cta">
+        <h3>Building your AI team?</h3>
+        <p>We help growth-stage companies hire and structure their first AI engineering team. No buzzwords, just builders.</p>
+        <a href="mailto:inbox@arkanislabs.com" class="cta-btn">Let's Talk</a>
+      </div>
+    </article>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Arkanis Labs Inc.</p>
+  </footer>
+
+  <script>
+    (() => {
+      const toggle = document.querySelector('.nav-toggle');
+      const navLinks = document.querySelector('.nav-links');
+      const backdrop = document.querySelector('.nav-backdrop');
+      const close = () => {
+        toggle.classList.remove('active');
+        navLinks.classList.remove('open');
+        backdrop.classList.remove('visible');
+        document.body.style.overflow = '';
+      };
+      toggle.addEventListener('click', () => {
+        const open = !navLinks.classList.contains('open');
+        toggle.classList.toggle('active', open);
+        navLinks.classList.toggle('open', open);
+        backdrop.classList.toggle('visible', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+      backdrop.addEventListener('click', close);
+      navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', close));
+    })();
+  </script>
+</body>
+</html>
