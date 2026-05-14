@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Graduation Pipeline for AI Workloads | Arkanis Labs Blog</title>
+  <meta name="description" content="Most over-budget AI products are running the wrong workloads on the wrong models. A three-tier framework for routing inference and where the real savings live." />
+  <meta name="keywords" content="AI cost optimization, inference cost, model routing, distillation, GraphRAG, LLM workloads, Arkanis Labs" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The Graduation Pipeline for AI Workloads" />
+  <meta property="og:description" content="Most over-budget AI products are running the wrong workloads on the wrong models." />
+  <meta property="og:url" content="https://www.arkanislabs.com/blog/2026-05-14-graduation-pipeline.html" />
+  <meta property="og:site_name" content="Arkanis Labs" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Graduation Pipeline for AI Workloads" />
+  <meta name="twitter:description" content="Most over-budget AI products are running the wrong workloads on the wrong models." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --bg-elevated: #111113;
+      --bg-card: #161619;
+      --border: #23232a;
+      --border-hover: #36363f;
+      --text-primary: #e8e8ed;
+      --text-secondary: #8a8a9a;
+      --text-muted: #55555f;
+      --accent: #c8f031;
+      --accent-dim: #a0c020;
+      --accent-glow: rgba(200, 240, 49, 0.08);
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Instrument Sans', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--sans);
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 11, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a.active { color: var(--accent); }
+
+    /* HAMBURGER */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      z-index: 102;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 18px;
+      height: 1.5px;
+      background: var(--text-primary);
+      transition: transform 0.35s cubic-bezier(0.77,0.2,0.05,1), opacity 0.25s ease;
+    }
+    .nav-toggle span:nth-child(1) { margin-bottom: 5px; }
+    .nav-toggle span:nth-child(3) { margin-top: 5px; }
+    .nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(3.5px, 4.5px); }
+    .nav-toggle.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(3.5px, -4.5px); }
+
+    /* LAYOUT */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 8rem 2rem 6rem;
+    }
+
+    /* BACK NAV */
+    .back-nav { margin-bottom: 3rem; }
+
+    .back-nav a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+
+    .back-nav a:hover { color: var(--accent); }
+
+    /* POST HEADER */
+    .post-header { margin-bottom: 3.5rem; }
+
+    .post-meta {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+
+    .post-header h1 {
+      font-family: var(--sans);
+      font-size: clamp(1.85rem, 4vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .post-header .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .post-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid rgba(200, 240, 49, 0.15);
+      padding: 0.25rem 0.65rem;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    /* CONTENT */
+    .post-content h2 {
+      font-family: var(--sans);
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin: 3rem 0 1rem;
+      padding-left: 1rem;
+      border-left: 3px solid var(--accent);
+    }
+
+    .post-content h3 {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 2rem 0 0.75rem;
+      letter-spacing: 0.02em;
+    }
+
+    .post-content p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.85;
+      margin-bottom: 1.5rem;
+    }
+
+    .post-content strong { color: var(--text-primary); font-weight: 600; }
+
+    .post-content blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      margin: 2.5rem 0;
+      background: var(--accent-glow);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .post-content blockquote p {
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      font-style: italic;
+      margin-bottom: 0;
+    }
+
+    .post-content ul {
+      list-style: none;
+      margin-bottom: 1.5rem;
+      padding: 0;
+    }
+
+    .post-content ul li {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      padding-left: 1.5rem;
+      position: relative;
+      margin-bottom: 0.75rem;
+    }
+
+    .post-content ul li::before {
+      content: '\2192';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-family: var(--mono);
+    }
+
+    .post-content a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(200, 240, 49, 0.3);
+      transition: border-color 0.2s;
+    }
+
+    .post-content a:hover { border-color: var(--accent); }
+
+    /* DEMO CTA */
+    .demo-cta {
+      margin-top: 4rem;
+      padding: 3rem 2.5rem;
+      border-radius: 8px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(200, 240, 49, 0.2);
+      text-align: center;
+    }
+
+    .demo-cta h3 {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .demo-cta p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 480px;
+      margin: 0 auto 2rem;
+      line-height: 1.75;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.85rem 1.75rem;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .cta-btn:hover { background: var(--accent-dim); transform: translateY(-1px); }
+
+    /* DIVIDER */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 3rem 0;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    @media (max-width: 680px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      .nav-links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 0;
+        background: rgba(10, 10, 11, 0.96);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        z-index: 99;
+        padding: 5rem 1.5rem 2rem;
+        border-bottom: 1px solid var(--border);
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      }
+      .nav-links.open {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .nav-links li {
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+      }
+      .nav-links li:last-child { border-bottom: none; }
+      .nav-links a {
+        font-size: 0.85rem;
+        display: block;
+        padding: 1rem 0.25rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        transition: color 0.2s, padding-left 0.3s;
+      }
+      .nav-links.open a { color: var(--text-secondary); }
+      .nav-links a:hover,
+      .nav-links a:active { color: var(--accent); padding-left: 0.5rem; }
+      .nav-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 98;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .nav-backdrop.visible { display: block; opacity: 1; }
+      .container { padding: 7rem 1.25rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-backdrop"></div>
+  <nav>
+    <a href="/" class="logo">Arkanis<span>Labs</span></a>
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="/#capabilities">Capabilities</a></li>
+      <li><a href="/#process">Process</a></li>
+      <li><a href="/#team">Team</a></li>
+      <li><a href="/blog/" class="active">Blog</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <div class="back-nav">
+      <a href="/blog/">&larr; Back to Blog</a>
+    </div>
+
+    <article>
+      <div class="post-header">
+        <div class="post-meta">MAY 14, 2026 &nbsp;&middot;&nbsp; ARKANIS LABS &nbsp;&middot;&nbsp; 8 MIN READ</div>
+        <h1>The Graduation Pipeline for AI Workloads</h1>
+        <p class="subtitle">Most over-budget AI products are running the wrong workloads on the wrong models.</p>
+        <div class="post-tags">
+          <span class="tag">Cost Analysis</span>
+          <span class="tag">Architecture</span>
+          <span class="tag">Strategy</span>
+        </div>
+      </div>
+
+      <div class="post-content">
+        <p>The cost of intelligence is falling fast. A model that matches GPT-4's release-day performance costs roughly a fortieth of what GPT-4 cost two years ago, and the trend is continuing.</p>
+
+        <p>The cost of <em>frontier</em> intelligence is not falling. Top-tier reasoning models cost roughly what they cost a year ago on the rate card, and substantially more in practice. Reasoning tokens have changed the unit economics of a single call. A model that used to produce a 500-token answer now produces 50,000 tokens of internal thinking on top of the answer, all billed at the output rate.</p>
+
+        <p>Both trends are real, and they explain something most founders are noticing. AI is getting cheaper. Their AI bill is not.</p>
+
+        <p>The reason is partly that workloads are getting heavier. Agents take more tokens than chat. Reasoning models take more tokens than non-reasoning ones. Context windows have stretched and teams have filled them. The Jevons paradox is real and it's playing out across the industry.</p>
+
+        <p>But the deeper reason is that most AI products are running on the wrong models for the work they're doing. Sometimes the model is more powerful than the task requires and the bill is larger than it should be. Sometimes the model is too weak for the task and the product feels unreliable. Both come from the same root cause: a workload gets assigned to a model during development, the assignment works well enough to ship, and nobody revisits it.</p>
+
+        <p>This article isn't for teams treating tokens per dollar as their north star metric. Tokenmaxxing optimizes the wrong unit. The unit that matters is the workload, and the question is whether each workload is running where it should.</p>
+
+        <p>A better way to think about this is to treat every workload in a product as belonging to one of three tiers, with the assignment as something that moves over time.</p>
+
+        <h2>Three tiers</h2>
+
+        <p><strong>Tier 1 is frontier intelligence.</strong> Opus, GPT-5, Gemini Ultra. These earn their keep on problems with a large solution space and real reasoning demands. Generating production code. Solving a mathematical problem. Working through an ambiguous brief where the answer isn't obvious until you've thought about it. A single Tier 1 call can cost twenty to a hundred times more than a Tier 3 call, which is fine when the task warrants the cost.</p>
+
+        <p><strong>Tier 2 is the workhorse.</strong> Sonnet, GPT-mini, Gemini Flash. Most production traffic belongs here. The work involves structured generation with some judgment, multi-turn conversations where the model tracks state, or synthesis over a small retrieved context. A customer support reply that needs the right tone and the right facts. A meeting summary that decides what's worth including. A scoped agent that calls two or three tools in a known sequence.</p>
+
+        <p><strong>Tier 3 is specialized.</strong> Borderline extractive tasks where the input goes in, a structured output comes out, and the definition of a correct answer is clear. Classifying a document into one of twelve categories. Extracting a geolocation from an address string. Tagging the entities in a paragraph. These workloads run cheaply on a small model trained for the job, often for a fraction of the cost of any general-purpose API.</p>
+
+        <p>The most common pattern in over-budget AI products is Tier 3 work running on Tier 1 hardware. The reverse is also common and harder to spot, which makes it the more dangerous of the two.</p>
+
+        <h2>Routing first, distillation later</h2>
+
+        <p>The reflex when an AI bill grows too large is to look for a clever optimization. Prompt compression. Caching. A distillation project. Those are real levers. They come second.</p>
+
+        <p>The first question is whether each workload is running on the right tier. Most teams default to a frontier model for everything because that's what they reached for during development, and the choice never got revisited. A reranking call running on GPT-5 when a tuned cross-encoder would do the same job for one percent of the cost. An entity extraction step using Opus when a fine-tuned 7B model would produce indistinguishable output. A classification gate calling a reasoning model when a simpler classifier would answer faster and cheaper.</p>
+
+        <p>The opposite mistake costs more in the long run. A team picks a cheap model early because the workload felt simple, ships it, and then starts hearing customer complaints about quality. Hallucinated facts in a summary. A support agent that gets the tone wrong on a sensitive ticket. A classification step that handles the obvious cases correctly but mangles the edge cases that matter most. The team treats these as prompt engineering problems and spends weeks tuning around them, when the actual fix is moving the workload up a tier.</p>
+
+        <p>Worse is when nobody complains. A common version of this is text-to-SQL running on an underpowered model. The queries it produces look plausible. They run. Some return wrong numbers, quietly, and feed dashboards that nobody is checking against ground truth. The model isn't dumb in isolation, it's that the task requires understanding the schema and the organization's context data, and the cheap model has neither. (How to do text-to-SQL well is its own post.) The cost of getting this wrong is paid in decisions made on bad data, which is harder to detect and more expensive than any inference bill.</p>
+
+        <p>There is no playbook for getting these calls right. Observability matters, evaluation harnesses matter, but the decision of where a workload belongs is still a judgment call about the shape of the task, the cost of being wrong, and the variance in the inputs. Good machine learning has always been as much art as science, and the people who get these calls right do it on intuition built up over years of watching models succeed and fail in production. Arkanis has been doing this work a long time. That intuition is most of what the audit is, and it's the part that can't be replaced by a dashboard.</p>
+
+        <p>A routing audit catches both patterns in days. The savings on overspend and the reliability fixes on underspend usually come out of the same pass through the logs. Distillation is the harder follow-on, for workloads where even the right tier is expensive. Run the frontier model long enough to log inputs and outputs, then train a small specialist to reproduce the behavior. The specialist runs at a fraction of the cost.</p>
+
+        <h2>A real example</h2>
+
+        <p>A recent engagement involved a GraphRAG system. GraphRAG is worth understanding even if you haven't run into it, because it solves a problem most products eventually hit.</p>
+
+        <p>Most AI products that talk to documents use retrieval-augmented generation, or RAG. The system searches for passages that look relevant to the user's question, passes those passages to a language model, and the model writes an answer using them. RAG is a reasonable default for a lot of products.</p>
+
+        <p>The limitation shows up at scale. Imagine a company sitting on 50,000 customer support tickets from the past year, and a product team asking "what are the top five issues driving cancellations?" No single ticket answers that question. The answer is distributed across thousands of tickets, and no language model has a context window large enough to read them all at once. A standard RAG system pulls the ten or twenty tickets that look most similar to the question, the model summarizes those, and you get a confident answer based on 0.04% of the data.</p>
+
+        <p>GraphRAG is built for this. It reads the corpus once, extracts the entities and the relationships between them into a knowledge graph, and writes summaries over regions of that graph. Questions get answered by performing a lossy search across those summaries instead of trying to cram every relevant document into a prompt. The result reflects the whole dataset rather than the slice that happened to fit in the window. For any product whose value comes from synthesizing across a corpus, this is the technique that makes it possible.</p>
+
+        <p>The catch is the build cost. Constructing the graph means running every chunk of every document through a frontier model to extract entities and relationships. For a company indexing millions of documents, the indexing bill runs into six figures a month before a single user question gets asked.</p>
+
+        <p>What worked was logging enough of those extractions to train a small specialist model on the documents that mattered. The specialist now handles extraction at a fraction of the original cost, with output quality indistinguishable from the frontier version.</p>
+
+        <p>The work was domain-specific. When the data shifts, say a move into a new vertical or a new customer with documents that look nothing like the training set, the specialist gets less reliable and someone has to retrain it. That maintenance is real work. It's part of why AI-native companies, even at scale, often look more like services companies on their balance sheet than the pure software companies they're compared to. Margins improve through operational discipline, not through code that ships once and runs forever.</p>
+
+        <p>Building that discipline is what separates AI companies running at software-like margins from the ones running at services margins across the board. Both are real businesses. The path is a choice.</p>
+
+        <h2>Why this is hard to see from the inside</h2>
+
+        <p>The framework is simple. Applying it to a product you built takes a kind of visibility most teams don't have.</p>
+
+        <p>API bills arrive as totals rather than workload-level cost breakdowns. Logs sit in different places for different providers. Quality issues get attributed to prompt engineering when the real problem is model fit. The team that built the product is too close to the code to sort it cleanly, and the finance side doesn't have the technical visibility to ask the right questions. Most companies operate with a vague sense that something is off, and no clear path to acting on it.</p>
+
+        <h2>A two-week audit</h2>
+
+        <p>Arkanis runs a two-week engagement that produces three things.</p>
+
+        <p>A complete map of every workload in the product, sorted by cost and by reliability. Some workloads are running on more model than they need. Others are running on less than they should. Both are findable in the logs.</p>
+
+        <p>A graduation plan for the top workloads. For each: which tier the work should run on, what it costs to make the move, what it saves or stabilizes once shipped, and how long the implementation takes.</p>
+
+        <p>The first changes, shipped during the engagement. Arkanis is a hands-on team. Meaningful improvements typically appear in the first few days, not at the end in a slide deck.</p>
+
+        <p>Two weeks of this work has saved clients hundreds of thousands of dollars in annualized inference cost and pulled brittle workloads back into reliable territory. The audit pays for itself before it ends.</p>
+
+        <p>If your AI bill is growing faster than your revenue, if your product is taking reliability hits that prompt tuning hasn't fixed, if your gross margin is becoming a fundraising problem, or if you suspect there are workloads that should move tiers in either direction but you don't have the in-house capacity to sort them out, get in touch.</p>
+      </div>
+
+      <div class="demo-cta">
+        <h3>Run the audit</h3>
+        <p>Two weeks. Every workload mapped, the top wins shipped, a graduation plan for the rest.</p>
+        <a href="mailto:inbox@arkanislabs.com" class="cta-btn">inbox@arkanislabs.com</a>
+      </div>
+    </article>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Arkanis Labs Inc.</p>
+  </footer>
+
+  <script>
+    (() => {
+      const toggle = document.querySelector('.nav-toggle');
+      const navLinks = document.querySelector('.nav-links');
+      const backdrop = document.querySelector('.nav-backdrop');
+      const close = () => {
+        toggle.classList.remove('active');
+        navLinks.classList.remove('open');
+        backdrop.classList.remove('visible');
+        document.body.style.overflow = '';
+      };
+      toggle.addEventListener('click', () => {
+        const open = !navLinks.classList.contains('open');
+        toggle.classList.toggle('active', open);
+        navLinks.classList.toggle('open', open);
+        backdrop.classList.toggle('visible', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+      backdrop.addEventListener('click', close);
+      navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', close));
+    })();
+  </script>
+</body>
+</html>
