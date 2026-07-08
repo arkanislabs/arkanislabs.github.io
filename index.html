@@ -1,802 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arkanis Labs | AI Systems Engineering</title>
-  <meta name="description" content="Arkanis Labs builds AI systems for venture-backed teams. Data engineering, LLM agents, recommender systems, custom model training & deployment." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #0a0a0b;
-      --bg-elevated: #111113;
-      --bg-card: #161619;
-      --border: #23232a;
-      --border-hover: #36363f;
-      --text-primary: #e8e8ed;
-      --text-secondary: #8a8a9a;
-      --text-muted: #55555f;
-      --accent: #c8f031;
-      --accent-dim: #a0c020;
-      --accent-glow: rgba(200, 240, 49, 0.08);
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Instrument Sans', -apple-system, sans-serif;
-    }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; font-size: 16px; }
-
-    body {
-      background: var(--bg);
-      color: var(--text-primary);
-      font-family: var(--sans);
-      line-height: 1.7;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    ::selection {
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-    /* NAV */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      padding: 1.25rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(10, 10, 11, 0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo {
-      font-family: var(--mono);
-      font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      text-decoration: none;
-    }
-
-    .logo span { color: var(--accent); }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      text-decoration: none;
-      letter-spacing: 0.03em;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--text-primary); }
-
-    /* HAMBURGER */
-    .nav-toggle {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.5rem;
-      z-index: 102;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .nav-toggle span {
-      display: block;
-      width: 18px;
-      height: 1.5px;
-      background: var(--text-primary);
-      transition: transform 0.35s cubic-bezier(0.77,0.2,0.05,1), opacity 0.25s ease;
-    }
-    .nav-toggle span:nth-child(1) { margin-bottom: 5px; }
-    .nav-toggle span:nth-child(3) { margin-top: 5px; }
-    .nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(3.5px, 4.5px); }
-    .nav-toggle.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .nav-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(3.5px, -4.5px); }
-
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 8rem 2rem 6rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .hero-tag {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      color: var(--accent);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
-      opacity: 0;
-      animation: fadeUp 0.6s ease forwards;
-    }
-
-    .hero h1 {
-      font-family: var(--sans);
-      font-size: clamp(2.4rem, 5vw, 3.6rem);
-      font-weight: 700;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      margin-bottom: 1.75rem;
-      opacity: 0;
-      animation: fadeUp 0.6s ease 0.1s forwards;
-    }
-
-    .hero p {
-      font-size: 1.15rem;
-      color: var(--text-secondary);
-      max-width: 600px;
-      line-height: 1.75;
-      margin-bottom: 2.5rem;
-      opacity: 0;
-      animation: fadeUp 0.6s ease 0.2s forwards;
-    }
-
-    .hero-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--bg);
-      background: var(--accent);
-      padding: 0.85rem 1.75rem;
-      text-decoration: none;
-      border-radius: 4px;
-      transition: all 0.2s;
-      opacity: 0;
-      animation: fadeUp 0.6s ease 0.3s forwards;
-    }
-
-    .hero-cta:hover {
-      background: var(--accent-dim);
-      transform: translateY(-1px);
-    }
-
-    .hero-cta::after {
-      content: '→';
-      transition: transform 0.2s;
-    }
-
-    .hero-cta:hover::after { transform: translateX(3px); }
-
-    /* SECTIONS */
-    section {
-      padding: 6rem 2rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .section-label {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-
-    section > h2 {
-      font-family: var(--sans);
-      font-size: 1.85rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 1rem;
-    }
-
-    section > .section-intro {
-      color: var(--text-secondary);
-      font-size: 1.05rem;
-      max-width: 640px;
-      margin-bottom: 3rem;
-      line-height: 1.75;
-    }
-
-    /* DIVIDER */
-    .divider {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-
-    .divider hr {
-      border: none;
-      border-top: 1px solid var(--border);
-    }
-
-    /* CAPABILITIES GRID */
-    .cap-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .cap-item {
-      background: var(--bg-card);
-      padding: 2rem;
-      transition: background 0.25s;
-    }
-
-    .cap-item:hover { background: var(--bg-elevated); }
-
-    .cap-item h3 {
-      font-family: var(--mono);
-      font-size: 0.88rem;
-      font-weight: 600;
-      margin-bottom: 0.6rem;
-      color: var(--text-primary);
-    }
-
-    .cap-item p {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      line-height: 1.65;
-    }
-
-    /* PROCESS */
-    .process-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-
-    .step {
-      display: grid;
-      grid-template-columns: 3.5rem 1fr;
-      gap: 1.25rem;
-      align-items: start;
-    }
-
-    .step-num {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--accent);
-      background: var(--accent-glow);
-      width: 3rem;
-      height: 3rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      border: 1px solid rgba(200, 240, 49, 0.15);
-      flex-shrink: 0;
-    }
-
-    .step-content h3 {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 0.4rem;
-    }
-
-    .step-content p {
-      color: var(--text-secondary);
-      font-size: 0.92rem;
-      line-height: 1.7;
-    }
-
-    .step-detail {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 0.4rem;
-      padding-left: 0.75rem;
-      border-left: 2px solid var(--border);
-    }
-
-    /* WHO WE ARE */
-    .team-block {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 2.5rem;
-      background: var(--bg-card);
-    }
-
-    .team-block p {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      line-height: 1.8;
-      margin-bottom: 1rem;
-    }
-
-    .team-block p:last-child { margin-bottom: 0; }
-
-    .team-traits {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      overflow: hidden;
-      margin-top: 2rem;
-    }
-
-    .trait {
-      background: var(--bg-card);
-      padding: 1.5rem;
-    }
-
-    .trait h4 {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-
-    .trait p {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 0;
-    }
-
-    /* TEAM CARDS */
-    .team-cards {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .team-card {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--bg-card);
-      overflow: hidden;
-      transition: border-color 0.25s;
-    }
-
-    .team-card:hover { border-color: var(--border-hover); }
-
-    .team-card img {
-      width: 100%;
-      aspect-ratio: 1;
-      object-fit: cover;
-      display: block;
-      filter: grayscale(30%);
-      transition: filter 0.3s;
-    }
-
-    .team-card:hover img { filter: grayscale(0%); }
-
-    .team-card-info {
-      padding: 1.25rem 1.5rem;
-    }
-
-    .team-card-info h4 {
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.2rem;
-    }
-
-    .team-card-info .role {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      font-weight: 500;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.75rem;
-    }
-
-    .team-card-info p {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 0.75rem;
-    }
-
-    .team-card-info p:last-child { margin-bottom: 0; }
-
-
-    /* CLIENTS */
-    .client-context {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-
-    .client-card {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 2rem;
-      background: var(--bg-card);
-      transition: border-color 0.25s;
-    }
-
-    .client-card:hover { border-color: var(--border-hover); }
-
-    .client-card h3 {
-      font-family: var(--mono);
-      font-size: 0.82rem;
-      font-weight: 600;
-      margin-bottom: 0.6rem;
-    }
-
-    .client-card p {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      line-height: 1.65;
-    }
-
-    /* CTA */
-    .cta-section {
-      text-align: left;
-      padding-top: 4rem;
-      padding-bottom: 8rem;
-    }
-
-    .cta-section h2 {
-      font-size: 1.85rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 1rem;
-    }
-
-    .cta-section p {
-      color: var(--text-secondary);
-      font-size: 1.05rem;
-      max-width: 540px;
-      margin-bottom: 2rem;
-      line-height: 1.75;
-    }
-
-    .cta-email {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--bg);
-      background: var(--accent);
-      padding: 0.85rem 1.75rem;
-      text-decoration: none;
-      border-radius: 4px;
-      transition: all 0.2s;
-    }
-
-    .cta-email:hover {
-      background: var(--accent-dim);
-      transform: translateY(-1px);
-    }
-
-    /* FOOTER */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem;
-      text-align: center;
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    /* ANIMATIONS */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 680px) {
-      nav { padding: 1rem 1.25rem; }
-      .nav-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-      .nav-links {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        flex-direction: column;
-        gap: 0;
-        background: rgba(10, 10, 11, 0.96);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        z-index: 99;
-        padding: 5rem 1.5rem 2rem;
-        border-bottom: 1px solid var(--border);
-        transform: translateY(-100%);
-        opacity: 0;
-        pointer-events: none;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-      }
-      .nav-links.open {
-        transform: translateY(0);
-        opacity: 1;
-        pointer-events: auto;
-      }
-      .nav-links li {
-        border-bottom: 1px solid rgba(255,255,255,0.04);
-      }
-      .nav-links li:last-child { border-bottom: none; }
-      .nav-links a {
-        font-size: 0.85rem;
-        display: block;
-        padding: 1rem 0.25rem;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--text-secondary);
-        transition: color 0.2s, padding-left 0.3s;
-      }
-      .nav-links.open a { color: var(--text-secondary); }
-      .nav-links a:hover,
-      .nav-links a:active { color: var(--accent); padding-left: 0.5rem; }
-      .nav-backdrop {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.4);
-        z-index: 98;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      .nav-backdrop.visible { display: block; opacity: 1; }
-      .hero { padding: 7rem 1.25rem 4rem; }
-      section { padding: 4rem 1.25rem; }
-      .divider { padding: 0 1.25rem; }
-      .cap-grid { grid-template-columns: 1fr; }
-      .client-context { grid-template-columns: 1fr; }
-      .team-traits { grid-template-columns: 1fr; }
-      .team-cards { grid-template-columns: 1fr; }
-      .step { grid-template-columns: 2.5rem 1fr; gap: 1rem; }
-      .step-num { width: 2.5rem; height: 2.5rem; font-size: 0.7rem; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arkanis Labs | AI engineering built to win</title>
+<meta name="description" content="Arkanis Labs deploys forward-deployed senior engineers for production AI. We ship from week one, build what your customers actually use, and hand it off so your team can own it." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F6F4;
+    --navy:#0F1721;
+    --teal:#0091B2;
+    --teal-deep:#007690;
+    --slate:#64748B;
+    --line:#E4E3DD;
+    --line-strong:#D6D5CE;
+    --sans:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --pad:clamp(1.25rem,5vw,3.5rem);
+    --wrap:1200px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--navy);font-family:var(--sans);
+    font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--teal);color:#fff}
+  .wrap{max-width:var(--wrap);margin:0 auto;padding-left:var(--pad);padding-right:var(--pad)}
+  section[id]{scroll-margin-top:84px}
+
+  .label{font-family:var(--mono);font-weight:500;font-size:12px;
+    letter-spacing:0.1em;text-transform:uppercase;color:var(--slate)}
+  .sq{width:12px;height:12px;background:var(--teal);display:inline-block;flex:none}
+  .kicker{display:flex;align-items:center;gap:0.7em;margin-bottom:1.8rem}
+
+  /* NAV */
+  header{position:sticky;top:0;z-index:50;background:rgba(246,246,244,0.85);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:9px;font-family:var(--mono);
+    font-weight:500;font-size:16px;letter-spacing:0.01em}
+  .nav-links{display:flex;align-items:center;gap:2rem}
+  .nav-links a{font-size:14px;color:var(--slate);transition:color .18s}
+  .nav-links a:hover{color:var(--navy)}
+  .btn{font-family:var(--sans);font-weight:500;font-size:14px;
+    background:var(--teal);color:var(--bg);padding:0.62rem 1.1rem;border-radius:7px;
+    transition:background .18s;border:none;cursor:pointer;display:inline-block}
+  .btn:hover{background:var(--teal-deep)}
+  .link{color:var(--teal);font-weight:500;font-size:15px;transition:color .18s}
+  .link:hover{color:var(--teal-deep)}
+  @media(max-width:520px){.nav-links{gap:1.15rem}.nav-links a{font-size:13px}}
+
+  /* HERO */
+  .hero{padding:clamp(4rem,11vh,8rem) 0 clamp(3.5rem,8vh,6rem)}
+  .hero .tagline{margin-bottom:1.8rem}
+  .hero h1{font-size:clamp(2.5rem,6.2vw,5.1rem);font-weight:600;line-height:1.02;
+    letter-spacing:-0.025em;max-width:17ch}
+  .hero h1 .mute{color:var(--slate)}
+  .hero .sub{color:var(--slate);font-size:clamp(1.05rem,1.5vw,1.25rem);
+    max-width:46ch;margin-top:1.7rem;line-height:1.5}
+  .hero-cta{display:flex;align-items:center;gap:1.5rem;margin-top:2.4rem;flex-wrap:wrap}
+
+  /* SECTION */
+  section.block{padding:clamp(4.5rem,11vh,8rem) 0;border-top:1px solid var(--line)}
+  .lead{font-size:clamp(1.9rem,4.2vw,3.3rem);font-weight:600;line-height:1.08;
+    letter-spacing:-0.02em;max-width:18ch}
+  .body{color:var(--slate);max-width:54ch;margin-top:1.5rem;font-size:1.08rem}
+
+  /* CREDENTIALS */
+  .names{margin-top:1.5rem;display:flex;flex-wrap:wrap;align-items:center;
+    gap:0.5rem 1rem;font-weight:500;font-size:clamp(1.05rem,1.9vw,1.5rem);letter-spacing:-0.01em}
+  .names .s{color:var(--line-strong);font-weight:400}
+  .names span:not(.s){transition:color .18s}
+  .names:hover span:not(.s){color:var(--slate)}
+  .names span:not(.s):hover{color:var(--teal)}
+
+  /* DARK PROOF SECTION */
+  .dark{background:var(--navy);color:var(--bg);border-top:none}
+  .dark .label{color:#8A97A6}
+  .dark .lead{color:var(--bg);max-width:24ch}
+  .proof{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(1.6rem,3vw,2.6rem);margin-top:3.8rem}
+  .proof .p .n{font-weight:600;font-size:clamp(2.3rem,4.4vw,3.4rem);line-height:0.95;
+    letter-spacing:-0.03em;color:var(--teal)}
+  .proof .p .c{color:#A7B2BF;font-size:13.5px;margin-top:0.9rem;line-height:1.5}
+  .proof .p .sq{margin-bottom:1.3rem}
+  @media(max-width:820px){.proof{grid-template-columns:repeat(2,1fr);gap:2.4rem}}
+  @media(max-width:460px){.proof{grid-template-columns:1fr}}
+
+  /* APPROACH */
+  .beats{font-weight:600;font-size:clamp(2rem,5.2vw,4.2rem);line-height:1;
+    letter-spacing:-0.025em;margin-top:0.4rem}
+  .beats .b{color:var(--teal)}
+  .beats-note{color:var(--slate);margin-top:1.1rem;font-size:1.05rem}
+  .steps{margin-top:3.6rem;border-top:1px solid var(--line)}
+  .step{display:grid;grid-template-columns:70px 1fr;gap:1.6rem;padding:2.2rem 0;
+    border-bottom:1px solid var(--line)}
+  .step .i{font-family:var(--mono);font-weight:500;font-size:15px;color:var(--teal);padding-top:0.3rem}
+  .step h3{font-weight:600;font-size:clamp(1.3rem,2.3vw,1.7rem);letter-spacing:-0.015em}
+  .step p{color:var(--slate);margin-top:0.7rem;max-width:62ch;font-size:1.03rem;line-height:1.65}
+  @media(max-width:600px){.step{grid-template-columns:1fr;gap:0.6rem}}
+
+  /* PILLARS */
+  .pillars{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:3.4rem}
+  .pillar{background:#FAFAF8;border:1px solid var(--line);border-radius:12px;padding:2.1rem 1.9rem}
+  .pillar .sq{margin-bottom:1.4rem}
+  .pillar h3{font-weight:600;font-size:1.4rem;letter-spacing:-0.015em}
+  .pillar p{color:var(--slate);margin-top:0.8rem;font-size:1.02rem;line-height:1.6}
+  @media(max-width:760px){.pillars{grid-template-columns:1fr}}
+
+  /* CLOSING */
+  .closing{padding:clamp(6rem,14vh,10rem) 0;border-top:1px solid var(--line)}
+  .closing h2{font-size:clamp(3rem,9vw,7rem);font-weight:600;line-height:0.95;letter-spacing:-0.03em}
+  .closing .cs{color:var(--slate);max-width:42ch;margin-top:1.6rem;font-size:1.15rem}
+  .closing-cta{display:flex;align-items:center;gap:1.5rem;margin-top:2.5rem;flex-wrap:wrap}
+  .closing .tag{font-family:var(--mono);font-size:12px;letter-spacing:0.16em;
+    text-transform:uppercase;color:var(--teal);margin-top:3.2rem}
+
+  /* FOOTER */
+  footer{padding:2.6rem 0;border-top:1px solid var(--line)}
+  .foot{display:flex;justify-content:space-between;gap:1.4rem;flex-wrap:wrap;
+    font-family:var(--mono);font-size:12px;letter-spacing:0.04em;color:var(--slate)}
+  .foot a:hover{color:var(--navy)}
+
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  :focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style>
+<noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
 </head>
 <body>
 
-  <div class="nav-backdrop"></div>
-  <nav>
-    <a href="/" class="logo">Arkanis<span>Labs</span></a>
-    <button class="nav-toggle" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
-    </button>
-    <ul class="nav-links">
-      <li><a href="#capabilities">Capabilities</a></li>
-      <li><a href="#process">Process</a></li>
-      <li><a href="#team">Team</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
+<header>
+  <div class="wrap nav">
+    <a href="/" class="brand"><span class="sq"></span>arkanis</a>
+    <nav class="nav-links">
+      <a href="#approach">Approach</a>
+      <a href="#why">Why us</a>
+      <a href="/blog/">Blog</a>
+    </nav>
+  </div>
+</header>
+
+<main>
 
   <!-- HERO -->
-  <header class="hero">
-    <div class="hero-tag">AI Systems Engineering</div>
-    <h1>We build the AI systems that venture-backed teams ship to production.</h1>
-    <p>
-      Arkanis Labs is a systems design and implementation shop. We work with VC firms, their portfolio companies, and early-stage startups to build AI infrastructure that survives contact with real users. In 2026 alone, teams we've worked with have raised over $7M USD off proof-of-concept projects we helped build.
-    </p>
-    <a href="#contact" class="hero-cta">Get in Touch</a>
-  </header>
-
-  <div class="divider"><hr /></div>
-
-  <!-- CAPABILITIES -->
-  <section id="capabilities">
-    <div class="section-label">What We Build</div>
-    <h2>Practical systems, not science projects.</h2>
-    <p class="section-intro">
-      We focus on the engineering work that turns AI from a slide deck into something customers actually use. If it involves data moving through a system and a model making decisions, it's probably in our wheelhouse.
-    </p>
-    <div class="cap-grid">
-      <div class="cap-item">
-        <h3>Data Engineering</h3>
-        <p>Pipelines, ETL, schema design, and the plumbing that makes everything else possible. Clean data in, useful data out. We work across warehouse platforms and build systems that don't silently rot.</p>
-      </div>
-      <div class="cap-item">
-        <h3>LLM Agents & Workflows</h3>
-        <p>Task-specific agents with structured memory, tool use, and clear accountability. Multi-agent orchestration when the problem calls for it. We build agents that do real work—not chatbots with delusions of competence.</p>
-      </div>
-      <div class="cap-item">
-        <h3>Recommender Systems</h3>
-        <p>Ranking, personalization, and discovery systems built for your specific domain. From cold-start strategies to production feedback loops that actually improve over time.</p>
-      </div>
-      <div class="cap-item">
-        <h3>Custom Model Training & Deployment</h3>
-        <p>Fine-tuning, distillation, and purpose-built models deployed to environments that make sense for your constraints. We handle the full path from research code to production monitoring.</p>
+  <section class="hero">
+    <div class="wrap">
+      <div class="tagline label reveal">AI engineering built to win</div>
+      <h1 class="reveal">AI is minting billionaires. <span class="mute">And burying everyone else.</span></h1>
+      <p class="sub reveal">Forward-deployed senior engineers for production AI. We ship from week one, build what your customers actually use, and hand it off so your team can own it.</p>
+      <div class="hero-cta reveal">
+        <a href="#approach" class="link">See how we work &rarr;</a>
       </div>
     </div>
   </section>
 
-  <div class="divider"><hr /></div>
-
-  <!-- WHO WE WORK WITH -->
-  <section id="clients">
-    <div class="section-label">Who We Work With</div>
-    <h2>Built for teams that move fast.</h2>
-    <p class="section-intro">
-      Our clients are venture-backed companies at the stage where AI is a core bet, not a side experiment. We plug in where you need us.
-    </p>
-    <div class="client-context">
-      <div class="client-card">
-        <h3>Startups & Portfolio Companies</h3>
-        <p>You need to ship an AI feature and don't have the team to build it yet. We integrate with your engineers, write production code, and help you hit the milestone that unlocks the next round.</p>
-      </div>
-      <div class="client-card">
-        <h3>VC Firms & Advisors</h3>
-        <p>You need technical diligence on a deal, or a portfolio company needs hands-on engineering help. We provide implementation specialists for greenfield projects and advisory support on hiring, architecture, and technical strategy.</p>
+  <!-- CREDENTIALS -->
+  <section class="block">
+    <div class="wrap">
+      <div class="kicker"><span class="sq"></span><span class="label">Our team has built at</span></div>
+      <div class="names reveal">
+        <span>Microsoft Research</span><span class="s">/</span>
+        <span>DARPA</span><span class="s">/</span>
+        <span>Stanford</span><span class="s">/</span>
+        <span>Cohere</span><span class="s">/</span>
+        <span>Axonify</span><span class="s">/</span>
+        <span>EvenUp</span>
       </div>
     </div>
   </section>
 
-  <div class="divider"><hr /></div>
+  <!-- PROOF (dark) -->
+  <section class="block dark">
+    <div class="wrap">
+      <div class="kicker"><span class="sq"></span><span class="label">2026 so far</span></div>
+      <h2 class="lead reveal">95% of AI pilots fail. We deliver from week one.</h2>
+      <div class="proof">
+        <div class="p reveal"><div class="n">$11M+</div><div class="c">raised by clients on products we built</div></div>
+        <div class="p reveal"><div class="n">3 teams</div><div class="c">of founding engineers hired, from hundreds of candidates we vetted</div></div>
+        <div class="p reveal"><div class="n">Millions</div><div class="c">of requests a week, handled by agents we built and handed off, still running without us</div></div>
+        <div class="p reveal"><div class="n">Day 1</div><div class="c">measurement built in, so every return is tied to your KPIs</div></div>
+      </div>
+    </div>
+  </section>
 
-  <!-- PROCESS -->
-  <section id="process">
-    <div class="section-label">How We Work</div>
-    <h2>Designed to build trust fast.</h2>
-    <p class="section-intro">
-      Most AI engagements fail because the scope is wrong, not because the engineering is hard. Our process is built to catch that early and move quickly once we know the problem is real.
-    </p>
-    <div class="process-steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-content">
-          <h3>Discovery</h3>
-          <p>A focused 1–2 week period where we define the technical path and start writing code. We're typically making meaningful contributions within the first few days—not spending weeks on a strategy deck.</p>
-          <div class="step-detail">If we can't solve the problem, we say so. No commitment trap—either party can walk away.</div>
+  <!-- APPROACH -->
+  <section class="block" id="approach">
+    <div class="wrap">
+      <div class="kicker"><span class="sq"></span><span class="label">The approach</span></div>
+      <h2 class="lead reveal">We build your AI team from zero to one.</h2>
+      <div class="beats reveal">Deploy. <span class="b">Build.</span> Hand off.</div>
+      <p class="beats-note reveal">We succeed the day you can run it without us.</p>
+
+      <div class="steps">
+        <div class="step reveal">
+          <div class="i">01</div>
+          <div>
+            <h3>We set the foundation</h3>
+            <p>Whatever shape your codebase is in, there's no judgment here. We've seen worse, and we know how to fix it, so whoever builds next inherits something solid instead of a mess.</p>
+          </div>
         </div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-content">
-          <h3>Scoped Delivery</h3>
-          <p>Concrete deliverables with clear timelines and pass/fail criteria. You know what you're getting, when you're getting it, and how to evaluate whether it works. No ambiguous "ongoing development."</p>
+        <div class="step reveal">
+          <div class="i">02</div>
+          <div>
+            <h3>We make sure the work has an owner</h3>
+            <p>Sometimes that's a permanent team we help you hire, from our network of vetted experts or candidates you source. Sometimes it's your own engineers picking up a proof of concept and running with it. The handoff fits where you actually are.</p>
+          </div>
         </div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-content">
-          <h3>Partnership</h3>
-          <p>For teams that need sustained support, we move into a partnership model: priority access to our engineers, ongoing strategy consultations, and the continuity of working with people who already know your systems inside out.</p>
+        <div class="step reveal">
+          <div class="i">03</div>
+          <div>
+            <h3>We build it, then hand it over</h3>
+            <p>You get working systems and the full context to run them. Our in-house agentic memory tracks every decision as we build, so nothing lives only in an engineer's head. Everything is documented, every transition is clean, and we stay on as backup for as long as you want us, and no longer.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="divider"><hr /></div>
-
-  <!-- TEAM -->
-  <section id="team">
-    <div class="section-label">Who We Are</div>
-    <h2>Engineers who build because they can't stop.</h2>
-    <div class="team-block">
-      <p>
-        We hire engineers with deep system design instincts who use AI tooling as leverage—not as a substitute for understanding the problem. The kind of people who know when the model is wrong before the metrics tell them, because they've built enough systems to have intuition about how things break.
-      </p>
-      <p>
-        Everyone here has covered the full deployment stack, from exploratory research code to production monitoring and continuous improvement. We're pragmatic tinkerers who build for the sake of building and take genuine pride in the craft.
-      </p>
-    </div>
-    <div class="team-traits">
-      <div class="trait">
-        <h4>System Design</h4>
-        <p>Architecture-first thinking. We design systems that hold up under real load and real edge cases, not just happy-path demos.</p>
-      </div>
-      <div class="trait">
-        <h4>AI-Augmented, Not AI-Dependent</h4>
-        <p>Our engineers use AI tooling to move fast without outsourcing their judgment. The tools amplify; they don't replace the thinking.</p>
-      </div>
-      <div class="trait">
-        <h4>Full Stack ML</h4>
-        <p>From research notebooks to production pipelines, monitoring dashboards to rollback strategies. No hand-off gaps.</p>
-      </div>
-    </div>
-    <div class="team-cards">
-      <div class="team-card">
-        <img src="images/the_goat_400.png" alt="Deltcho Valtchanov" />
-        <div class="team-card-info">
-          <h4>Deltcho Valtchanov, PhD</h4>
-          <div class="role">Co-Founder</div>
-          <p>Deltcho has spent over a decade building the kinds of AI systems that most companies are now trying, and often failing, to build.</p>
-          <p>He shipped one of the first customer-facing LLM products on the market years before ChatGPT, led billion-parameter model training and serving at Axonify, and built agentic legal AI at EvenUp that could reason over tens of millions of words with full audit trails.</p>
-          <p>That depth, from low-level model internals to production retrieval systems, is what lets him cut through the noise in a due diligence review. He knows what real AI IP looks like because he's built it, and he can spot a failing project early because he's been the one called in to fix them.</p>
-          <p>At Arkanis, he leads technical due diligence for VC-backed AI investments and runs project recovery for enterprises where delivery has gone sideways.</p>
+  <!-- WHY US -->
+  <section class="block" id="why">
+    <div class="wrap">
+      <div class="kicker"><span class="sq"></span><span class="label">Why Arkanis</span></div>
+      <h2 class="lead reveal">You don't have to wait for the perfect team to ship.</h2>
+      <p class="body reveal">Great AI engineers are rare, and building a team around them can take most of a year. We put senior people in the room now, so you're shipping while you hire, and we help you vet candidates so the team you keep can reach production instead of just filling seats with impressive résumés.</p>
+      <div class="pillars reveal">
+        <div class="pillar">
+          <span class="sq"></span>
+          <h3>Senior only</h3>
+          <p>Every engineer we deploy has built and operated production AI. No juniors learning on your budget.</p>
         </div>
-      </div>
-      <div class="team-card">
-        <img src="images/j_whiting_400.jpg" alt="Julian Whiting" />
-        <div class="team-card-info">
-          <h4>Julian Whiting</h4>
-          <div class="role">Co-Founder</div>
-          <p>Julian spent the better part of a decade as a hands-on ML engineer and technical leader, building systems at the intersection of applied AI research and production infrastructure.</p>
-          <p>He developed DRIFT Search working directly with the Microsoft Research team on the GraphRAG project, taking it from initial research through to open source implementation, one of the most widely adopted contributions in the RAG space. He built the document intelligence engine for DARPA's ASKEM program, consolidating teams using dated tech and returning millions in budget back to the program.</p>
-          <p>He scaled self-hosted transformer inference endpoints to millions of daily requests at Bark, and alongside co-founder Deltcho, shipped some of the first GPT-2-based content generators to Fortune 500 companies in the pre-GPT API era.</p>
-          <p>At Arkanis, he brings that same bias toward building production AI systems that actually work.</p>
+        <div class="pillar">
+          <span class="sq"></span>
+          <h3>Code velocity is a commodity</h3>
+          <p>Anyone can ship fast now. The harder, more valuable work is building the right thing, and after owning AI products end to end at large organizations, we help you get that right from day one so you ship something your customers actually use.</p>
         </div>
-      </div>
-      <div class="team-card">
-        <img src="images/a_citron_400.jpg" alt="Alberto Citron" />
-        <div class="team-card-info">
-          <h4>Alberto Citron</h4>
-          <div class="role">Principal Cloud & AI Infrastructure Engineer</div>
-          <p>Alberto has spent the better part of a decade building data and ML infrastructure across ad-tech, fintech, healthcare, and supply chain, from fraud detection models at Experian to rebuilding entire cloud pipelines (AWS → GCP) for biotech startups.</p>
-          <p>He's worked extensively with GCP, BigQuery, Kubernetes, and distributed systems like Dask, with a consistent focus on making data platforms that actually scale under real workloads.</p>
-          <p>At Arkanis Labs, he brings hands-on depth in cloud-native architecture and ML-ready data infrastructure.</p>
+        <div class="pillar">
+          <span class="sq"></span>
+          <h3>Production, not pilots</h3>
+          <p>We design for the part most teams skip: the evaluation, governance, and control layers that keep a fast system from being confidently wrong at scale.</p>
         </div>
-      </div>
-      <div class="team-card">
-        <img src="images/w_el_ahmar_400.jpg" alt="Wassim El Ahmar" />
-        <div class="team-card-info">
-          <h4>Wassim El Ahmar, PhD</h4>
-          <div class="role">Advisor — Edge AI & Embedded Vision Systems</div>
-          <p>Wassim is a professor of electrical and computer engineering at the University of Ottawa and a computer vision expert with deep roots in both academic research and production industry systems.</p>
-          <p>As Staff ML Engineer at Inspiren, he architects hybrid edge-cloud perception systems using depth estimation, vision foundation models, and VLMs. He's built object tracking and re-identification systems for edge analytics, sensor fusion pipelines for autonomous vehicles (lidar, thermal, 3D cameras), and ported production vision models to next-gen NPU hardware, cutting unit costs by 90%.</p>
-          <p>He holds a PhD in deep learning optimization for embedded systems.</p>
-          <p>At Arkanis, Wassim advises on the problems most teams can't touch: real-time computer vision on constrained hardware, multi-sensor perception for autonomous systems, and AI-enabled situational awareness for defence and critical infrastructure.</p>
+        <div class="pillar">
+          <span class="sq"></span>
+          <h3>We build ourselves out of a job</h3>
+          <p>Most firms want to embed forever. We embed to hand off, and we help you vet the team that takes over, so the capability stays after we leave.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="divider"><hr /></div>
-
-  <!-- CTA -->
-  <section class="cta-section" id="contact">
-    <div class="section-label">Let's Talk</div>
-    <h2>Tell us what you're building.</h2>
-    <p>
-      We'll tell you honestly whether we can help. If we can, we'll be writing code within the week. If we can't, we'll point you in the right direction.
-    </p>
-    <a href="mailto:inbox@arkanislabs.com" class="cta-email">inbox@arkanislabs.com</a>
+  <!-- CLOSING -->
+  <section class="closing" id="contact">
+    <div class="wrap">
+      <h2 class="reveal">Be in the 5%.</h2>
+      <p class="cs reveal">Tell us what you're building. We'll tell you how to get it into production.</p>
+      <div class="closing-cta reveal">
+        <a href="mailto:inbox@arkanislabs.com" class="btn">Get in touch</a>
+        <a href="/blog/" class="link">See the work &rarr;</a>
+      </div>
+      <div class="tag reveal">AI engineering built to win</div>
+    </div>
   </section>
 
-  <footer>
-    <p>&copy; 2026 Arkanis Labs Inc.</p>
-  </footer>
+</main>
 
-  <script>
-    (() => {
-      const toggle = document.querySelector('.nav-toggle');
-      const navLinks = document.querySelector('.nav-links');
-      const backdrop = document.querySelector('.nav-backdrop');
-      const close = () => {
-        toggle.classList.remove('active');
-        navLinks.classList.remove('open');
-        backdrop.classList.remove('visible');
-        document.body.style.overflow = '';
-      };
-      toggle.addEventListener('click', () => {
-        const open = !navLinks.classList.contains('open');
-        toggle.classList.toggle('active', open);
-        navLinks.classList.toggle('open', open);
-        backdrop.classList.toggle('visible', open);
-        document.body.style.overflow = open ? 'hidden' : '';
-      });
-      backdrop.addEventListener('click', close);
-      navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', close));
-    })();
-  </script>
+<footer>
+  <div class="wrap foot">
+    <div>Arkanis Labs Inc.</div>
+    <div>AI systems engineering / Kitchener&ndash;Waterloo</div>
+    <div><a href="mailto:inbox@arkanislabs.com">inbox@arkanislabs.com</a></div>
+  </div>
+</footer>
+
+<script>
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:0.1,rootMargin:'0px 0px -30px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
 </body>
 </html>

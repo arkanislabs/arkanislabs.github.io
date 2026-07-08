@@ -7,302 +7,113 @@
   <meta name="description" content="Writing from the Arkanis Labs team on AI systems engineering, data infrastructure, LLM agents, and building production ML." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg: #0a0a0b;
-      --bg-elevated: #111113;
-      --bg-card: #161619;
-      --border: #23232a;
-      --border-hover: #36363f;
-      --text-primary: #e8e8ed;
-      --text-secondary: #8a8a9a;
-      --text-muted: #55555f;
-      --accent: #c8f031;
-      --accent-dim: #a0c020;
-      --accent-glow: rgba(200, 240, 49, 0.08);
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Instrument Sans', -apple-system, sans-serif;
+    :root{
+      --bg:#F6F6F4;
+      --bg-card:#FAFAF8;
+      --navy:#0F1721;
+      --ink:#3d4552;
+      --teal:#0091B2;
+      --teal-deep:#007690;
+      --teal-soft:rgba(0,145,178,0.08);
+      --teal-line:rgba(0,145,178,0.22);
+      --slate:#64748B;
+      --line:#E4E3DD;
+      --line-strong:#D6D5CE;
+      --sans:'Inter',system-ui,sans-serif;
+      --mono:'IBM Plex Mono',ui-monospace,monospace;
+      --pad:clamp(1.25rem,5vw,3.5rem);
+      --wrap:1200px;
     }
 
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--navy);font-family:var(--sans);
+      font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    ::selection{background:var(--teal);color:#fff}
+    .wrap{max-width:var(--wrap);margin:0 auto;padding-left:var(--pad);padding-right:var(--pad)}
+    :focus-visible{outline:2px solid var(--teal);outline-offset:3px}
 
-    html { scroll-behavior: smooth; font-size: 16px; }
-
-    body {
-      background: var(--bg);
-      color: var(--text-primary);
-      font-family: var(--sans);
-      line-height: 1.7;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    ::selection { background: var(--accent); color: var(--bg); }
+    .sq{width:12px;height:12px;background:var(--teal);display:inline-block;flex:none}
+    .label{font-family:var(--mono);font-weight:500;font-size:12px;
+      letter-spacing:0.1em;text-transform:uppercase;color:var(--slate)}
+    .kicker{display:flex;align-items:center;gap:0.7em;margin-bottom:1.6rem}
 
     /* NAV */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 1.25rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(10, 10, 11, 0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo {
-      font-family: var(--mono);
-      font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      text-decoration: none;
-    }
-
-    .logo span { color: var(--accent); }
-
-    .nav-links { display: flex; gap: 2rem; list-style: none; }
-
-    .nav-links a {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      text-decoration: none;
-      letter-spacing: 0.03em;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--text-primary); }
-    .nav-links a.active { color: var(--accent); }
-
-    /* HAMBURGER */
-    .nav-toggle {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.5rem;
-      z-index: 102;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .nav-toggle span {
-      display: block;
-      width: 18px;
-      height: 1.5px;
-      background: var(--text-primary);
-      transition: transform 0.35s cubic-bezier(0.77,0.2,0.05,1), opacity 0.25s ease;
-    }
-    .nav-toggle span:nth-child(1) { margin-bottom: 5px; }
-    .nav-toggle span:nth-child(3) { margin-top: 5px; }
-    .nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(3.5px, 4.5px); }
-    .nav-toggle.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .nav-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(3.5px, -4.5px); }
+    header{position:sticky;top:0;z-index:50;background:rgba(246,246,244,0.85);
+      backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+    .brand{display:flex;align-items:center;gap:9px;font-family:var(--mono);
+      font-weight:500;font-size:16px;letter-spacing:0.01em}
+    .nav-links{display:flex;align-items:center;gap:2rem}
+    .nav-links a{font-size:14px;color:var(--slate);transition:color .18s}
+    .nav-links a:hover{color:var(--navy)}
+    .nav-links a.active{color:var(--navy)}
+    .btn{font-family:var(--sans);font-weight:500;font-size:14px;
+      background:var(--navy);color:var(--bg);padding:0.62rem 1.1rem;border-radius:7px;
+      transition:background .18s;border:none;cursor:pointer;display:inline-block}
+    .btn:hover{background:#1b2735}
+    @media(max-width:520px){.nav-links{gap:1.15rem}.nav-links a{font-size:13px}}
 
     /* PAGE HEADER */
-    .page-header {
-      padding: 10rem 2rem 4rem;
-      max-width: 900px;
-      margin: 0 auto;
-      opacity: 0;
-      animation: fadeUp 0.6s ease forwards;
-    }
-
-    .section-label {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-
-    .page-header h1 {
-      font-family: var(--sans);
-      font-size: clamp(1.85rem, 4vw, 2.6rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.2;
-      margin-bottom: 1rem;
-    }
-
-    .page-header p {
-      color: var(--text-secondary);
-      font-size: 1.05rem;
-      max-width: 560px;
-      line-height: 1.75;
-    }
-
-    /* DIVIDER */
-    .divider {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-
-    .divider hr { border: none; border-top: 1px solid var(--border); }
+    .page-header{max-width:var(--wrap);margin:0 auto;padding:clamp(3.5rem,8vh,5.5rem) var(--pad) 3rem;
+      animation:fadeUp .6s ease both}
+    .page-header h1{font-family:var(--sans);font-size:clamp(2.2rem,5vw,3.4rem);font-weight:600;
+      letter-spacing:-0.025em;line-height:1.05;margin-bottom:1rem}
+    .page-header p{color:var(--slate);font-size:1.1rem;max-width:52ch;line-height:1.55}
 
     /* BLOG LIST */
-    .blog-list {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 2rem 8rem;
-    }
-
-    .post-row {
-      display: grid;
-      grid-template-columns: 9rem 1fr;
-      gap: 2rem;
-      padding: 2rem 0;
-      border-bottom: 1px solid var(--border);
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .post-row:first-child { border-top: 1px solid var(--border); }
-    .post-row:hover .post-title { color: var(--accent); }
-
-    .post-date {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      padding-top: 0.2rem;
-      letter-spacing: 0.02em;
-    }
-
-    .post-meta { display: flex; flex-direction: column; gap: 0.35rem; }
-
-    .post-title {
-      font-family: var(--sans);
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      transition: color 0.2s;
-      letter-spacing: -0.01em;
-    }
-
-    .post-excerpt {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      line-height: 1.65;
-    }
-
-    .post-tag {
-      display: inline-block;
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--accent);
-      background: var(--accent-glow);
-      border: 1px solid rgba(200, 240, 49, 0.15);
-      padding: 0.2rem 0.55rem;
-      border-radius: 3px;
-      letter-spacing: 0.04em;
-      margin-top: 0.25rem;
-      width: fit-content;
-    }
+    .blog-list{max-width:var(--wrap);margin:0 auto;padding:0 var(--pad) 6rem}
+    .post-row{display:grid;grid-template-columns:10rem 1fr;gap:2rem;padding:2.2rem 0;
+      border-bottom:1px solid var(--line);transition:background .18s}
+    .post-row:first-child{border-top:1px solid var(--line)}
+    .post-row:hover .post-title{color:var(--teal)}
+    .post-date{font-family:var(--mono);font-size:12px;color:var(--slate);
+      padding-top:0.25rem;letter-spacing:0.02em}
+    .post-meta{display:flex;flex-direction:column;gap:0.5rem}
+    .post-title{font-family:var(--sans);font-size:1.3rem;font-weight:600;color:var(--navy);
+      transition:color .18s;letter-spacing:-0.015em;line-height:1.25}
+    .post-excerpt{font-size:1.02rem;color:var(--ink);line-height:1.55;max-width:60ch}
+    .post-tag{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--teal-deep);
+      background:var(--teal-soft);border:1px solid var(--teal-line);padding:0.28rem 0.7rem;
+      border-radius:100px;letter-spacing:0.04em;margin-top:0.35rem;width:fit-content}
 
     /* FOOTER */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem;
-      text-align: center;
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
+    footer{padding:2.6rem 0;border-top:1px solid var(--line)}
+    .foot{display:flex;justify-content:space-between;gap:1.4rem;flex-wrap:wrap;
+      font-family:var(--mono);font-size:12px;letter-spacing:0.04em;color:var(--slate)}
+    .foot a{color:var(--teal)}
+    .foot a:hover{color:var(--teal-deep)}
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+    @media(prefers-reduced-motion:reduce){.page-header{animation:none}html{scroll-behavior:auto}}
 
-    @media (max-width: 680px) {
-      nav { padding: 1rem 1.25rem; }
-      .nav-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-      .nav-links {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        flex-direction: column;
-        gap: 0;
-        background: rgba(10, 10, 11, 0.96);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        z-index: 99;
-        padding: 5rem 1.5rem 2rem;
-        border-bottom: 1px solid var(--border);
-        transform: translateY(-100%);
-        opacity: 0;
-        pointer-events: none;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-      }
-      .nav-links.open {
-        transform: translateY(0);
-        opacity: 1;
-        pointer-events: auto;
-      }
-      .nav-links li {
-        border-bottom: 1px solid rgba(255,255,255,0.04);
-      }
-      .nav-links li:last-child { border-bottom: none; }
-      .nav-links a {
-        font-size: 0.85rem;
-        display: block;
-        padding: 1rem 0.25rem;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--text-secondary);
-        transition: color 0.2s, padding-left 0.3s;
-      }
-      .nav-links.open a { color: var(--text-secondary); }
-      .nav-links a:hover,
-      .nav-links a:active { color: var(--accent); padding-left: 0.5rem; }
-      .nav-backdrop {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.4);
-        z-index: 98;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      .nav-backdrop.visible { display: block; opacity: 1; }
-      .page-header { padding: 8rem 1.25rem 3rem; }
-      .blog-list { padding: 0 1.25rem 6rem; }
-      .divider { padding: 0 1.25rem; }
-      .post-row { grid-template-columns: 1fr; gap: 0.5rem; }
-      .post-date { padding-top: 0; }
+    @media(max-width:640px){
+      .post-row{grid-template-columns:1fr;gap:0.6rem}
+      .post-date{padding-top:0}
     }
   </style>
 </head>
 <body>
 
-  <div class="nav-backdrop"></div>
-  <nav>
-    <a href="/" class="logo">Arkanis<span>Labs</span></a>
-    <button class="nav-toggle" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
-    </button>
-    <ul class="nav-links">
-      <li><a href="/#capabilities">Capabilities</a></li>
-      <li><a href="/#process">Process</a></li>
-      <li><a href="/#team">Team</a></li>
-      <li><a href="/blog/" class="active">Blog</a></li>
-      <li><a href="/#contact">Contact</a></li>
-    </ul>
-  </nav>
+  <header>
+    <div class="wrap nav">
+      <a href="/" class="brand"><span class="sq"></span>arkanis</a>
+      <nav class="nav-links">
+        <a href="/#approach">Approach</a>
+        <a href="/#why">Why us</a>
+        <a href="/blog/" class="active">Blog</a>
+      </nav>
+    </div>
+  </header>
 
   <div class="page-header">
-    <div class="section-label">Writing</div>
+    <div class="kicker"><span class="sq"></span><span class="label">Writing</span></div>
     <h1>Notes from the build.</h1>
-    <p>Practical writing on AI systems engineering—what works, what doesn't, and why most AI projects fail before they ship.</p>
+    <p>Practical writing on AI systems engineering: what works, what doesn't, and why most AI projects fail before they ship.</p>
   </div>
-
-  <div class="divider"><hr /></div>
 
   <div class="blog-list">
 
@@ -346,7 +157,7 @@
       <div class="post-date">Jan 22, 2026</div>
       <div class="post-meta">
         <div class="post-title">The Semantic Backbone: Local vs. Hosted Embeddings</div>
-        <div class="post-excerpt">Why embedding models are the nervous system of agentic AI—and when you should own the weights instead of paying the token tax.</div>
+        <div class="post-excerpt">Why embedding models are the nervous system of agentic AI, and when you should own the weights instead of paying the token tax.</div>
         <div class="post-tag">AI Engineering</div>
       </div>
     </a>
@@ -354,30 +165,12 @@
   </div>
 
   <footer>
-    <p>&copy; 2026 Arkanis Labs Inc.</p>
+    <div class="wrap foot">
+      <div>Arkanis Labs Inc.</div>
+      <div>AI systems engineering / Kitchener&ndash;Waterloo</div>
+      <div><a href="mailto:inbox@arkanislabs.com">inbox@arkanislabs.com</a></div>
+    </div>
   </footer>
 
-  <script>
-    (() => {
-      const toggle = document.querySelector('.nav-toggle');
-      const navLinks = document.querySelector('.nav-links');
-      const backdrop = document.querySelector('.nav-backdrop');
-      const close = () => {
-        toggle.classList.remove('active');
-        navLinks.classList.remove('open');
-        backdrop.classList.remove('visible');
-        document.body.style.overflow = '';
-      };
-      toggle.addEventListener('click', () => {
-        const open = !navLinks.classList.contains('open');
-        toggle.classList.toggle('active', open);
-        navLinks.classList.toggle('open', open);
-        backdrop.classList.toggle('visible', open);
-        document.body.style.overflow = open ? 'hidden' : '';
-      });
-      backdrop.addEventListener('click', close);
-      navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', close));
-    })();
-  </script>
 </body>
 </html>
